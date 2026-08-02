@@ -156,6 +156,137 @@
       ::-webkit-scrollbar {
         display: none;
       }
+
+      /* ============ Piece + board motion ============ */
+      .game-piece {
+        will-change: transform, opacity;
+      }
+
+      @keyframes piece-pop-in {
+        0%   { transform: scale(0); opacity: 0; }
+        60%  { transform: scale(1.18); opacity: 1; }
+        100% { transform: scale(1); opacity: 1; }
+      }
+      .anim-place {
+        animation: piece-pop-in 320ms cubic-bezier(.34,1.56,.64,1) both;
+      }
+
+      @keyframes piece-capture-pop {
+        0%   { transform: scale(1) rotate(0deg); opacity: 1; filter: brightness(1); }
+        30%  { transform: scale(1.25) rotate(-6deg); opacity: 1; filter: brightness(1.6); }
+        100% { transform: scale(0) rotate(35deg); opacity: 0; filter: brightness(2); }
+      }
+      .anim-capture {
+        animation: piece-capture-pop 420ms cubic-bezier(.55,0,.85,.35) both;
+        z-index: 20;
+      }
+
+      @keyframes sacrifice-shake {
+        0%, 100% { transform: translateX(0) scale(1); }
+        20% { transform: translateX(-3px) scale(0.96); }
+        40% { transform: translateX(3px) scale(0.96); }
+        60% { transform: translateX(-2px) scale(0.96); }
+        80% { transform: translateX(2px) scale(0.96); }
+      }
+      .anim-sacrifice-marked {
+        animation: sacrifice-shake 0.5s ease-in-out infinite;
+      }
+
+      @keyframes board-entrance {
+        0% { opacity: 0; transform: translateY(18px) scale(0.98); }
+        100% { opacity: 1; transform: translateY(0) scale(1); }
+      }
+      .board-entrance {
+        animation: board-entrance 500ms cubic-bezier(.2,.8,.2,1) both;
+      }
+
+      @keyframes turn-bounce {
+        0% { transform: scale(0.85); }
+        55% { transform: scale(1.08); }
+        100% { transform: scale(1); }
+      }
+      .turn-bounce {
+        animation: turn-bounce 380ms cubic-bezier(.34,1.56,.64,1) both;
+      }
+
+      @keyframes forced-piece-glow {
+        0%, 100% { box-shadow: 0 0 6px 2px rgba(247,201,72,0.5); }
+        50% { box-shadow: 0 0 22px 10px rgba(247,201,72,0.9); }
+      }
+      .forced-glow {
+        animation: forced-piece-glow 1s infinite ease-in-out;
+        border: 2px solid rgba(247,201,72,0.95) !important;
+      }
+
+      /* ============ Toast (replaces static move-note) ============ */
+      #move-note {
+        min-height: 16px;
+        opacity: 0;
+        transform: translateY(-4px);
+        transition: opacity 220ms ease, transform 220ms ease;
+      }
+      #move-note.toast-visible {
+        opacity: 0.9;
+        transform: translateY(0);
+      }
+
+      /* ============ Win modal ============ */
+      .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        z-index: 200;
+        background: rgba(10,10,10,0.72);
+        backdrop-filter: blur(3px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 260ms ease;
+      }
+      .modal-backdrop.modal-open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal-card {
+        transform: scale(0.82) translateY(24px);
+        opacity: 0;
+        transition: transform 380ms cubic-bezier(.34,1.56,.64,1), opacity 300ms ease;
+      }
+      .modal-backdrop.modal-open .modal-card {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+      }
+
+      @keyframes trophy-spin-in {
+        0% { transform: rotate(-20deg) scale(0.4); opacity: 0; }
+        60% { transform: rotate(8deg) scale(1.15); opacity: 1; }
+        100% { transform: rotate(0deg) scale(1); opacity: 1; }
+      }
+      .trophy-anim {
+        animation: trophy-spin-in 560ms 120ms cubic-bezier(.34,1.56,.64,1) both;
+      }
+
+      #confetti-canvas {
+        position: fixed;
+        inset: 0;
+        z-index: 199;
+        pointer-events: none;
+      }
+
+      /* ============ Misc interactive polish ============ */
+      .game-piece {
+        cursor: pointer;
+      }
+      #board [data-row][data-col] {
+        transition: filter 150ms ease, transform 150ms ease;
+      }
+      .icon-btn {
+        transition: transform 150ms ease, background-color 150ms ease;
+      }
+      .icon-btn:active {
+        transform: scale(0.9);
+      }
     </style>
 <style>
     body {
@@ -175,14 +306,31 @@
 <div class="flex items-center gap-md">
 <div class="hidden md:flex items-center gap-lg mr-lg">
 <span class="font-label-mono text-label-mono text-primary cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">MATCH</span>
-<span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">REPLAY</span>
+<span id="replay-nav-btn" class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded transition-colors">REPLAY</span>
 <span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">RANKINGS</span>
 </div>
-<button class="p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full">
+<button id="sound-toggle-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="Toggle sound">
+<span class="material-symbols-outlined" id="sound-icon">volume_up</span>
+</button>
+<button id="new-game-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="New game">
+<span class="material-symbols-outlined">refresh</span>
+</button>
+<button class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full">
 <span class="material-symbols-outlined">settings</span>
 </button>
 </div>
 </header>
+<!-- Replay control bar (hidden unless a replay is running) -->
+<div id="replay-bar" class="hidden fixed top-16 left-0 w-full z-40 flex items-center justify-center gap-md px-lg py-2 bg-primary-container/95 border-b border-white/10 backdrop-blur-sm">
+<span class="material-symbols-outlined text-on-primary-container text-lg animate-pulse">play_circle</span>
+<span class="font-label-mono text-label-mono text-on-primary-container" id="replay-status-text">REPLAYING MATCH — MOVE 0/0</span>
+<div class="flex items-center gap-xs ml-md">
+<button id="replay-slower-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">0.5x</button>
+<button id="replay-pause-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">PAUSE</button>
+<button id="replay-faster-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">2x</button>
+<button id="replay-stop-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/30 text-on-primary-container hover:brightness-125 transition-all ml-sm">STOP</button>
+</div>
+</div>
 <!-- Main Game Arena -->
 <main class="flex-grow flex flex-col items-center justify-center pt-24 pb-32 px-md overflow-y-auto">
 <div class="w-full max-w-7xl flex flex-col items-center gap-xl">
@@ -200,7 +348,7 @@
 </aside>
 <!-- Centerpiece: The Board -->
 <section class="flex flex-col items-center w-full max-w-[550px] order-1 lg:order-2">
-<div class="relative w-full bg-surface-container-highest p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<div class="board-entrance relative w-full bg-surface-container-highest p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 <!-- Board Coordinates - Letters -->
 <div class="flex justify-around px-8 mb-2">
 <span class="font-label-mono text-[10px] opacity-40">A</span>
@@ -293,6 +441,31 @@ LOAD EXAMPLE
 </div>
 </div>
 </footer>
+<!-- Confetti canvas (win celebration) -->
+<canvas id="confetti-canvas"></canvas>
+
+<!-- Win Modal -->
+<div class="modal-backdrop" id="win-modal">
+<div class="modal-card bg-surface-container-high border border-white/10 rounded-xl shadow-2xl px-xl py-xl w-[90%] max-w-sm flex flex-col items-center text-center gap-md">
+<div class="trophy-anim w-20 h-20 rounded-full flex items-center justify-center" id="modal-trophy-bg">
+<span class="material-symbols-outlined text-5xl" style="font-variation-settings: 'FILL' 1, 'wght' 500;">emoji_events</span>
+</div>
+<div>
+<p class="font-label-mono text-label-mono opacity-60 mb-1" id="modal-subtitle">MATCH COMPLETE</p>
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface" id="modal-winner-text">PLAYER ONE WINS</h2>
+</div>
+<p class="font-body-sm text-body-sm opacity-70" id="modal-detail">Victory secured on the tactical grid.</p>
+<div class="flex gap-sm w-full mt-sm">
+<button id="modal-close-btn" class="flex-1 font-label-mono text-label-mono px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+REVIEW BOARD
+</button>
+<button id="modal-newgame-btn" class="flex-1 font-label-mono text-label-mono px-4 py-2 bg-primary text-on-primary rounded-full hover:brightness-110 active:scale-95 transition-all">
+PLAY AGAIN
+</button>
+</div>
+</div>
+</div>
+
 <script>
     /* ============================================================
        STRATAGEM — Game Logic
@@ -396,8 +569,14 @@ LOAD EXAMPLE
     // game-changing action (a placement, a move, or a full auto-fill).
     const history = [];
 
+    // Replay log — an append-only record of the same snapshots, kept even after
+    // Undo pops them off the undo stack, so the whole match can be played back later.
+    const replayLog = [];
+
     function pushHistory() {
-        history.push(JSON.stringify(state));
+        const snapshot = JSON.stringify(state);
+        history.push(snapshot);
+        replayLog.push(snapshot);
     }
 
     function undo() {
@@ -418,6 +597,261 @@ LOAD EXAMPLE
     const exchangeBtnEl = document.getElementById('exchange-btn');
     const exampleBtnEl = document.getElementById('example-btn');
     const moveNoteEl = document.getElementById('move-note');
+    const soundToggleBtnEl = document.getElementById('sound-toggle-btn');
+    const soundIconEl = document.getElementById('sound-icon');
+    const newGameBtnEl = document.getElementById('new-game-btn');
+    const winModalEl = document.getElementById('win-modal');
+    const modalWinnerTextEl = document.getElementById('modal-winner-text');
+    const modalDetailEl = document.getElementById('modal-detail');
+    const modalTrophyBgEl = document.getElementById('modal-trophy-bg');
+    const modalCloseBtnEl = document.getElementById('modal-close-btn');
+    const modalNewGameBtnEl = document.getElementById('modal-newgame-btn');
+    const confettiCanvasEl = document.getElementById('confetti-canvas');
+    const replayNavBtnEl = document.getElementById('replay-nav-btn');
+    const replayBarEl = document.getElementById('replay-bar');
+    const replayStatusTextEl = document.getElementById('replay-status-text');
+    const replayPauseBtnEl = document.getElementById('replay-pause-btn');
+    const replayStopBtnEl = document.getElementById('replay-stop-btn');
+    const replaySlowerBtnEl = document.getElementById('replay-slower-btn');
+    const replayFasterBtnEl = document.getElementById('replay-faster-btn');
+
+    /* ============ Sound engine (tiny WebAudio beeps, no assets needed) ============ */
+    let soundEnabled = true;
+    let audioCtx = null;
+    function getAudioCtx() {
+        if (!audioCtx) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) audioCtx = new AC();
+        }
+        return audioCtx;
+    }
+    function playTone(freq, duration, type = 'sine', gainStart = 0.14, delay = 0) {
+        if (!soundEnabled) return;
+        const ctx = getAudioCtx();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = type;
+        osc.frequency.value = freq;
+        const startTime = ctx.currentTime + delay;
+        gain.gain.setValueAtTime(gainStart, startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, startTime + duration);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(startTime);
+        osc.stop(startTime + duration + 0.02);
+    }
+    const sound = {
+        place: () => playTone(520, 0.09, 'triangle'),
+        move: () => playTone(400, 0.1, 'sine'),
+        capture: () => { playTone(220, 0.12, 'sawtooth'); playTone(160, 0.16, 'square', 0.1, 0.05); },
+        select: () => playTone(700, 0.05, 'sine', 0.08),
+        invalid: () => playTone(140, 0.12, 'square', 0.08),
+        exchange: () => { playTone(300, 0.1, 'sawtooth'); playTone(500, 0.14, 'sawtooth', 0.1, 0.08); },
+        win: () => {
+            [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => playTone(f, 0.28, 'triangle', 0.13, i * 0.13));
+        }
+    };
+    soundToggleBtnEl.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundIconEl.textContent = soundEnabled ? 'volume_up' : 'volume_off';
+        if (soundEnabled) playTone(600, 0.06, 'sine', 0.08);
+    });
+
+    /* ============ Toast helper for the transient move-note line ============ */
+    let toastTimer = null;
+    function showToast(message) {
+        if (!message) {
+            moveNoteEl.classList.remove('toast-visible');
+            return;
+        }
+        moveNoteEl.textContent = message;
+        moveNoteEl.classList.remove('toast-visible');
+        // force reflow so the fade-in re-triggers even for repeated messages
+        void moveNoteEl.offsetWidth;
+        moveNoteEl.classList.add('toast-visible');
+        if (toastTimer) clearTimeout(toastTimer);
+    }
+
+    /* ============ Lightweight confetti burst for the win celebration ============ */
+    let confettiRunning = false;
+    function launchConfetti() {
+        const canvas = confettiCanvasEl;
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const colors = ['#ffb4ac', '#f7c948', '#e5e2e1', '#be2525', '#c6c6c6'];
+        const pieces = Array.from({ length: 140 }, () => ({
+            x: Math.random() * canvas.width,
+            y: -20 - Math.random() * canvas.height * 0.5,
+            size: 5 + Math.random() * 7,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            speedY: 2 + Math.random() * 3.5,
+            speedX: (Math.random() - 0.5) * 3,
+            rotation: Math.random() * 360,
+            spin: (Math.random() - 0.5) * 12,
+            shape: Math.random() > 0.5 ? 'rect' : 'circle'
+        }));
+
+        confettiRunning = true;
+        const startTime = performance.now();
+        const durationMs = 3200;
+
+        function frame(now) {
+            const elapsed = now - startTime;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pieces.forEach(p => {
+                p.x += p.speedX;
+                p.y += p.speedY;
+                p.rotation += p.spin;
+                ctx.save();
+                ctx.translate(p.x, p.y);
+                ctx.rotate((p.rotation * Math.PI) / 180);
+                ctx.fillStyle = p.color;
+                if (p.shape === 'rect') {
+                    ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, p.size / 2.4, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.restore();
+            });
+            if (elapsed < durationMs && confettiRunning) {
+                requestAnimationFrame(frame);
+            } else {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                confettiRunning = false;
+            }
+        }
+        requestAnimationFrame(frame);
+    }
+
+    /* ============ Win modal controls ============ */
+    function showWinModal(winnerColor) {
+        const winnerLabel = winnerColor === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+        modalWinnerTextEl.textContent = `${winnerLabel} WINS`;
+        modalDetailEl.textContent = winnerColor === 'red'
+            ? 'Red has cleared the board of black pieces. Victory secured.'
+            : 'Black has cleared the board of red pieces. Victory secured.';
+        modalTrophyBgEl.className = `trophy-anim w-20 h-20 rounded-full flex items-center justify-center ${winnerColor === 'red' ? 'piece-red' : 'piece-black'}`;
+        winModalEl.classList.add('modal-open');
+        sound.win();
+        launchConfetti();
+    }
+    function hideWinModal() {
+        winModalEl.classList.remove('modal-open');
+        confettiRunning = false;
+    }
+    modalCloseBtnEl.addEventListener('click', hideWinModal);
+    modalNewGameBtnEl.addEventListener('click', () => {
+        hideWinModal();
+        resetGame();
+    });
+    newGameBtnEl.addEventListener('click', () => {
+        if (isInputLocked()) return;
+        if (state.phase !== 'game-over') {
+            if (!confirm('Start a new game? Current progress will be lost.')) return;
+        }
+        resetGame();
+    });
+
+    /* ============ Match Replay ============ */
+    let replayModeActive = false;
+    let replayFrames = [];
+    let replayIndex = 0;
+    let replayPaused = false;
+    let replaySpeedMs = 900;
+    let replayTimerId = null;
+    let liveStateSnapshot = null;
+
+    function isInputLocked() {
+        return replayModeActive;
+    }
+
+    function updateReplayStatusText() {
+        replayStatusTextEl.textContent = `REPLAYING MATCH — MOVE ${replayIndex}/${replayFrames.length - 1}`;
+    }
+
+    function startReplay() {
+        if (replayModeActive) return;
+        if (replayLog.length === 0) {
+            showToast('NO MOVES RECORDED YET — PLAY A FEW TURNS FIRST');
+            return;
+        }
+
+        liveStateSnapshot = JSON.stringify(state);
+        replayFrames = [...replayLog, JSON.stringify(state)];
+        replayIndex = 0;
+        replayPaused = false;
+        replaySpeedMs = 900;
+        replayModeActive = true;
+
+        // Close out anything mid-flight so the replay starts from a clean slate
+        hideWinModal();
+        winModalEl.classList.remove('modal-open');
+
+        replayBarEl.classList.remove('hidden');
+        replayPauseBtnEl.textContent = 'PAUSE';
+        replayNavBtnEl.classList.add('text-primary');
+        updateReplayStatusText();
+
+        Object.assign(state, JSON.parse(replayFrames[0]));
+        render();
+
+        scheduleNextReplayFrame();
+    }
+
+    function scheduleNextReplayFrame() {
+        clearTimeout(replayTimerId);
+        if (replayPaused) return;
+        replayTimerId = setTimeout(advanceReplayFrame, replaySpeedMs);
+    }
+
+    function advanceReplayFrame() {
+        if (!replayModeActive || replayPaused) return;
+        if (replayIndex >= replayFrames.length - 1) {
+            // Reached the present — hold on the final frame briefly, then close out
+            updateReplayStatusText();
+            setTimeout(() => { if (replayModeActive) stopReplay(); }, 1200);
+            return;
+        }
+        replayIndex++;
+        Object.assign(state, JSON.parse(replayFrames[replayIndex]));
+        render();
+        updateReplayStatusText();
+        scheduleNextReplayFrame();
+    }
+
+    function stopReplay() {
+        if (!replayModeActive) return;
+        clearTimeout(replayTimerId);
+        replayModeActive = false;
+        replayPaused = false;
+        replayBarEl.classList.add('hidden');
+        replayNavBtnEl.classList.remove('text-primary');
+
+        if (liveStateSnapshot) {
+            Object.assign(state, JSON.parse(liveStateSnapshot));
+        }
+        render();
+    }
+
+    replayNavBtnEl.addEventListener('click', startReplay);
+    replayStopBtnEl.addEventListener('click', stopReplay);
+    replayPauseBtnEl.addEventListener('click', () => {
+        replayPaused = !replayPaused;
+        replayPauseBtnEl.textContent = replayPaused ? 'RESUME' : 'PAUSE';
+        if (!replayPaused) scheduleNextReplayFrame();
+        else clearTimeout(replayTimerId);
+    });
+    replaySlowerBtnEl.addEventListener('click', () => {
+        replaySpeedMs = Math.min(2400, replaySpeedMs * 1.6);
+    });
+    replayFasterBtnEl.addEventListener('click', () => {
+        replaySpeedMs = Math.max(220, replaySpeedMs / 1.6);
+    });
 
     function isCenter(row, col) {
         return row === CENTER.row && col === CENTER.col;
@@ -446,6 +880,43 @@ LOAD EXAMPLE
         }
     }
 
+    // Plays a quick scale-in "pop" animation on whatever piece currently sits at (row, col).
+    // Safe to call right after render() places a fresh piece div there.
+    function animatePlacement(row, col) {
+        const piece = squareEl(row, col).querySelector('.game-piece');
+        if (piece) piece.classList.add('anim-place');
+    }
+
+    // Classic FLIP technique: captures the moving piece's on-screen start position
+    // BEFORE the board data/DOM are updated, then — once render() has drawn the piece
+    // fresh at its destination — offsets it back to that start position with no
+    // transition and animates the offset back to zero, producing a genuine slide
+    // across the board regardless of how far apart the two squares are.
+    function captureFlipStart(row, col) {
+        return squareEl(row, col).getBoundingClientRect();
+    }
+    function playFlip(toRow, toCol, startRect) {
+        const toEl = squareEl(toRow, toCol);
+        const piece = toEl.querySelector('.game-piece');
+        if (!piece || !startRect) return;
+        const endRect = toEl.getBoundingClientRect();
+        const dx = startRect.left - endRect.left;
+        const dy = startRect.top - endRect.top;
+        if (dx === 0 && dy === 0) return;
+        piece.style.transition = 'none';
+        piece.style.transform = `translate(${dx}px, ${dy}px)`;
+        // force a reflow so the browser registers the starting transform before animating
+        void piece.getBoundingClientRect();
+        requestAnimationFrame(() => {
+            piece.style.transition = 'transform 260ms cubic-bezier(.22,.8,.25,1)';
+            piece.style.transform = 'translate(0px, 0px)';
+            piece.addEventListener('transitionend', () => {
+                piece.style.transition = '';
+                piece.style.transform = '';
+            }, { once: true });
+        });
+    }
+
     function getOrthogonalNeighbors(row, col) {
         return [
             { row: row - 1, col },
@@ -468,11 +939,13 @@ LOAD EXAMPLE
                     const piece = document.createElement('div');
                     const isSelectedPiece = state.phase === 'movement' && state.moveSelected &&
                         state.moveSelected.row === row && state.moveSelected.col === col;
+                    const isForcedPiece = state.forcedPiece && state.forcedPiece.row === row && state.forcedPiece.col === col;
                     piece.className = [
                         'game-piece w-[70%] h-[70%] rounded-full',
                         occupant === 'red' ? 'piece-red' : 'piece-black',
-                        isSelectedPiece ? 'ring-2 ring-white scale-110' : '',
-                        isMarkedSacrifice ? 'ring-4 ring-dashed ring-yellow-400 opacity-50' : ''
+                        isSelectedPiece && !isForcedPiece ? 'ring-2 ring-white scale-110' : '',
+                        isForcedPiece ? 'forced-glow scale-110' : '',
+                        isMarkedSacrifice ? 'anim-sacrifice-marked ring-4 ring-dashed ring-yellow-400 opacity-60' : ''
                     ].join(' ');
                     el.appendChild(piece);
                 }
@@ -531,7 +1004,15 @@ LOAD EXAMPLE
         }
     }
 
+    let lastTurnKey = '';
     function renderStatus() {
+        const turnKey = `${state.phase}|${state.current}|${state.exchangeMode}|${!!state.forcedPiece}|${state.winner}`;
+        if (turnKey !== lastTurnKey) {
+            lastTurnKey = turnKey;
+            turnIndicatorEl.classList.remove('turn-bounce');
+            void turnIndicatorEl.offsetWidth;
+            turnIndicatorEl.classList.add('turn-bounce');
+        }
         if (state.phase === 'placement') {
             p1CountEl.textContent = `P1: ${state.reserves.red}`;
             p2CountEl.textContent = `P2: ${state.reserves.black}`;
@@ -596,7 +1077,7 @@ LOAD EXAMPLE
             turnIndicatorEl.classList.add('bg-primary', 'text-on-primary');
         }
 
-        moveNoteEl.textContent = state.skipNote;
+        showToast(state.skipNote);
     }
 
     function render() {
@@ -675,6 +1156,32 @@ LOAD EXAMPLE
         render();
     }
 
+    function resetGame() {
+        history.length = 0;
+        replayLog.length = 0;
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                state.board[row][col] = null;
+            }
+        }
+        state.reserves.red = 24;
+        state.reserves.black = 24;
+        state.onBoard.red = 0;
+        state.onBoard.black = 0;
+        state.current = 'red';
+        state.placedThisTurn = 0;
+        state.phase = 'placement';
+        state.selected = false;
+        state.moveSelected = null;
+        state.forcedPiece = null;
+        state.exchangeMode = null;
+        state.exchangeSacrifice = [];
+        state.skipNote = '';
+        state.winner = null;
+        showToast('');
+        render();
+    }
+
     function endTurn() {
         state.placedThisTurn = 0;
         state.selected = false;
@@ -697,6 +1204,7 @@ LOAD EXAMPLE
     }
 
     function handleReserveClick(color, index) {
+        if (isInputLocked()) return;
         if (state.phase !== 'placement') return;
         if (color !== state.current) return;           // can only pick up your own pieces
         if (state.reserves[color] <= 0) return;
@@ -707,11 +1215,13 @@ LOAD EXAMPLE
             state.selected = false;
         } else {
             state.selected = true;
+            sound.select();
         }
         render();
     }
 
     function handleSquareClick(row, col) {
+        if (isInputLocked()) return;
         if (state.phase === 'placement') {
             handlePlacementSquareClick(row, col);
         } else if (state.phase === 'movement') {
@@ -739,6 +1249,8 @@ LOAD EXAMPLE
         state.selected = false;
 
         render();
+        animatePlacement(row, col);
+        sound.place();
 
         if (checkPlacementComplete()) return;
 
@@ -764,6 +1276,7 @@ LOAD EXAMPLE
                 state.moveSelected = null; // deselect
             } else {
                 state.moveSelected = { row, col };
+                sound.select();
             }
             render();
             return;
@@ -780,34 +1293,72 @@ LOAD EXAMPLE
         // NEW RULE: During a bonus turn, reject any move that does not result in a capture
         if (state.forcedPiece) {
             if (!wouldCaptureIfMoved(state.moveSelected.row, state.moveSelected.col, row, col, state.current)) {
-                return; 
+                sound.invalid();
+                return;
             }
         }
 
         pushHistory();
 
+        const fromRow = state.moveSelected.row;
+        const fromCol = state.moveSelected.col;
+        const flipStartRect = captureFlipStart(fromRow, fromCol);
+
         // Execute the move — one move per turn
         state.board[row][col] = state.current;
-        state.board[state.moveSelected.row][state.moveSelected.col] = null;
+        state.board[fromRow][fromCol] = null;
         state.moveSelected = null;
+        const mover = state.current;
 
-        // Check whether this move sandwiched any opposing piece(s) between two of the mover's pieces
-        const capturedCount = captureFlanks(row, col, state.current);
+        // Check whether this move sandwiched any opposing piece(s) between two of the mover's
+        // pieces, WITHOUT removing them yet — they stay on the board just long enough to play
+        // a capture animation before actually being cleared.
+        const captureCells = getCaptureCells(row, col, mover);
+        const capturedCount = captureCells.length;
+
         if (capturedCount > 0) {
-            const capLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const capLabel = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
             state.skipNote = `${capLabel} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''}!`;
-            state.onBoard[otherPlayer(state.current)] -= capturedCount;
         } else {
             state.skipNote = '';
         }
 
         render();
+        playFlip(row, col, flipStartRect);
+        sound.move();
 
+        if (capturedCount > 0) {
+            // Give the moved piece a moment to finish sliding, then pop the captured pieces
+            requestAnimationFrame(() => {
+                captureCells.forEach(({ row: r, col: c }) => {
+                    const el = squareEl(r, c).querySelector('.game-piece');
+                    if (el) el.classList.add('anim-capture');
+                });
+                sound.capture();
+            });
+
+            setTimeout(() => {
+                captureCells.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
+                state.onBoard[otherPlayer(mover)] -= capturedCount;
+                render();
+                finishMovementResolution(row, col, capturedCount, mover);
+            }, 420);
+        } else {
+            finishMovementResolution(row, col, capturedCount, mover);
+        }
+    }
+
+    // Shared tail-end of a movement-phase turn: checks for a win, then a bonus
+    // "eat again" turn for the same piece, otherwise hands the turn over.
+    // Used by both normal moves and (indirectly) kept separate from Exchange,
+    // which has its own resolution path.
+    function finishMovementResolution(row, col, capturedCount, mover) {
         // Win condition: The instant a player reaches 0 pieces.
-        if (state.onBoard[otherPlayer(state.current)] === 0) {
+        if (state.onBoard[otherPlayer(mover)] === 0) {
             state.phase = 'game-over';
-            state.winner = state.current;
+            state.winner = mover;
             render();
+            showWinModal(mover);
             return;
         }
 
@@ -816,9 +1367,9 @@ LOAD EXAMPLE
         // piece must move again — no other piece on the board is eligible during the bonus
         // turn. This repeats after every subsequent capture until a move by that piece fails
         // to capture anything.
-        if (capturedCount > 0 && hasCapturingMoveForPiece(row, col, state.current)) {
+        if (capturedCount > 0 && hasCapturingMoveForPiece(row, col, mover)) {
             state.forcedPiece = { row, col };
-            const label = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const label = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
             state.skipNote = `${label} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''} — SAME PIECE CAN EAT AGAIN, GO AGAIN!`;
             render();
             return;
@@ -828,10 +1379,12 @@ LOAD EXAMPLE
         advanceMovementTurn();
     }
 
-    // Looks outward from the piece that just moved, in all 4 orthogonal directions.
-    // Any unbroken run of opponent pieces immediately bounded by one of the mover's
-    // own pieces gets captured (removed from the board).
-    function captureFlanks(row, col, color) {
+    // Non-mutating: looks outward from the piece that just moved, in all 4 orthogonal
+    // directions, and returns the coordinates of every opponent piece that is captured
+    // (a single piece immediately flanked by two of the mover's own pieces — X-O-X).
+    // A run of two or more opponent pieces in a row is never captured, even if bounded
+    // on both ends.
+    function getCaptureCells(row, col, color) {
         const opponent = otherPlayer(color);
         const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
         const capturedCells = [];
@@ -846,15 +1399,19 @@ LOAD EXAMPLE
             const farInBounds = farRow >= 0 && farRow < BOARD_SIZE && farCol >= 0 && farCol < BOARD_SIZE;
             if (!midInBounds || !farInBounds) continue;
 
-            // Valid capture requires EXACTLY one opponent piece immediately next to us,
-            // followed directly by one of our own pieces — i.e. "X O X".
-            // A run of two or more opponent pieces in a row ("X O O X") is never captured.
             const isSingleSandwich = state.board[midRow][midCol] === opponent && state.board[farRow][farCol] === color;
             if (isSingleSandwich) {
                 capturedCells.push({ row: midRow, col: midCol });
             }
         }
 
+        return capturedCells;
+    }
+
+    // Mutating wrapper kept for any legacy callers: computes capture cells and removes
+    // them from the board immediately, returning how many were captured.
+    function captureFlanks(row, col, color) {
+        const capturedCells = getCaptureCells(row, col, color);
         capturedCells.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
         return capturedCells.length;
     }
@@ -1033,37 +1590,54 @@ LOAD EXAMPLE
 
         pushHistory();
 
-        // Remove the two sacrificed pieces
-        state.exchangeSacrifice.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
-        state.onBoard[state.current] -= 2;
+        const mover = state.current;
+        const sacrificeCells = [...state.exchangeSacrifice];
+        const targetCell = { row, col };
 
-        // Remove the targeted opponent piece
-        state.board[row][col] = null;
-        state.onBoard[opponent] -= 1;
-
-        const label = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+        const label = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
         state.skipNote = `${label} SACRIFICED 2 PIECES IN AN EXCHANGE!`;
-
         state.exchangeMode = null;
         state.exchangeSacrifice = [];
 
         render();
+        sound.exchange();
 
-        // Check both sides for a game-ending outcome
-        if (state.onBoard[opponent] === 0) {
-            state.phase = 'game-over';
-            state.winner = state.current;
-            render();
-            return;
-        }
-        if (state.onBoard[state.current] === 0) {
-            state.phase = 'game-over';
-            state.winner = opponent;
-            render();
-            return;
-        }
+        // Play the pop animation on all three pieces (the two sacrifices and the captured
+        // target) before actually clearing them off the board.
+        requestAnimationFrame(() => {
+            [...sacrificeCells, targetCell].forEach(({ row: r, col: c }) => {
+                const el = squareEl(r, c).querySelector('.game-piece');
+                if (el) el.classList.add('anim-capture');
+            });
+        });
 
-        advanceMovementTurn();
+        setTimeout(() => {
+            sacrificeCells.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
+            state.onBoard[mover] -= 2;
+
+            state.board[targetCell.row][targetCell.col] = null;
+            state.onBoard[opponent] -= 1;
+
+            render();
+
+            // Check both sides for a game-ending outcome
+            if (state.onBoard[opponent] === 0) {
+                state.phase = 'game-over';
+                state.winner = mover;
+                render();
+                showWinModal(mover);
+                return;
+            }
+            if (state.onBoard[mover] === 0) {
+                state.phase = 'game-over';
+                state.winner = opponent;
+                render();
+                showWinModal(opponent);
+                return;
+            }
+
+            advanceMovementTurn();
+        }, 420);
     }
 
     // Builds a genuine confinement trap: a black piece walled into a 1-wide vertical corridor,
@@ -1079,6 +1653,7 @@ LOAD EXAMPLE
     // into the movement phase, with Red to move first.
     function loadExchangeExample() {
         history.length = 0; // fresh test scenario — the old undo stack no longer applies
+        replayLog.length = 0;
 
         for (let row = 0; row < BOARD_SIZE; row++) {
             for (let col = 0; col < BOARD_SIZE; col++) {
@@ -1174,16 +1749,17 @@ LOAD EXAMPLE
         render();
     }
 
-    fillBtnEl.addEventListener('click', autoFillRemaining);
-    undoBtnEl.addEventListener('click', undo);
+    fillBtnEl.addEventListener('click', () => { if (!isInputLocked()) autoFillRemaining(); });
+    undoBtnEl.addEventListener('click', () => { if (!isInputLocked()) undo(); });
     exchangeBtnEl.addEventListener('click', () => {
+        if (isInputLocked()) return;
         if (state.exchangeMode) {
             cancelExchange();
         } else {
             startExchange();
         }
     });
-    exampleBtnEl.addEventListener('click', loadExchangeExample);
+    exampleBtnEl.addEventListener('click', () => { if (!isInputLocked()) loadExchangeExample(); });
 
 
     function nextPhase() {
