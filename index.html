@@ -1,12 +1,12 @@
 <!DOCTYPE html>
-<html class="dark" lang="en"><head>
+<html class="dark" lang="ar" dir="rtl"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>STRATAGEM | Tactical Mastery</title>
+<title>KHARGBA | إتقان الاستراتيجية</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;family=Cairo:wght@300..900&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;family=Cairo:wght@300..900&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
       tailwind.config = {
         darkMode: "class",
@@ -78,13 +78,14 @@
                     "container-gap": "20px"
             },
             "fontFamily": {
-                    "body-sm": ["Geist"],
-                    "headline-md": ["Geist"],
-                    "headline-sm": ["Geist"],
-                    "label-mono": ["JetBrains Mono"],
-                    "headline-md-mobile": ["Geist"],
-                    "display-lg": ["Geist"],
-                    "body-md": ["Geist"]
+                    "body-sm": ["Cairo", "Geist", "sans-serif"],
+                    "headline-md": ["Cairo", "Geist", "sans-serif"],
+                    "headline-sm": ["Cairo", "Geist", "sans-serif"],
+                    "label-mono": ["Cairo", "JetBrains Mono"],
+                    "headline-md-mobile": ["Cairo", "Geist", "sans-serif"],
+                    "display-lg": ["Cairo", "Geist", "sans-serif"],
+                    "body-md": ["Cairo", "Geist", "sans-serif"],
+                    "brand": ["JetBrains Mono", "monospace"]
             },
             "fontSize": {
                     "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
@@ -301,18 +302,18 @@
 <button class="p-2 text-primary hover:bg-surface-bright/10 transition-colors rounded-full active:opacity-80 active:scale-95 transition-all">
 <span class="material-symbols-outlined">menu</span>
 </button>
-<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface">STRATAGEM</h1>
+<h1 class="font-brand text-headline-md font-bold tracking-tighter text-on-surface" dir="ltr">KHARGBA</h1>
 </div>
 <div class="flex items-center gap-md">
 <div class="hidden md:flex items-center gap-lg mr-lg">
-<span class="font-label-mono text-label-mono text-primary cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">MATCH</span>
-<span id="replay-nav-btn" class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded transition-colors">REPLAY</span>
-<span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">RANKINGS</span>
+<span class="font-label-mono text-label-mono text-primary cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">المباراة</span>
+<span id="replay-nav-btn" class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded transition-colors">إعادة العرض</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">الترتيب</span>
 </div>
-<button id="sound-toggle-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="Toggle sound">
+<button id="sound-toggle-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="تبديل الصوت">
 <span class="material-symbols-outlined" id="sound-icon">volume_up</span>
 </button>
-<button id="new-game-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="New game">
+<button id="new-game-btn" class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full" title="مباراة جديدة">
 <span class="material-symbols-outlined">refresh</span>
 </button>
 <button class="icon-btn p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full">
@@ -323,12 +324,12 @@
 <!-- Replay control bar (hidden unless a replay is running) -->
 <div id="replay-bar" class="hidden fixed top-16 left-0 w-full z-40 flex items-center justify-center gap-md px-lg py-2 bg-primary-container/95 border-b border-white/10 backdrop-blur-sm">
 <span class="material-symbols-outlined text-on-primary-container text-lg animate-pulse">play_circle</span>
-<span class="font-label-mono text-label-mono text-on-primary-container" id="replay-status-text">REPLAYING MATCH — MOVE 0/0</span>
+<span class="font-label-mono text-label-mono text-on-primary-container" id="replay-status-text">جارِ إعادة العرض — الحركة 0/0</span>
 <div class="flex items-center gap-xs ml-md">
-<button id="replay-slower-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">0.5x</button>
-<button id="replay-pause-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">PAUSE</button>
-<button id="replay-faster-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">2x</button>
-<button id="replay-stop-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/30 text-on-primary-container hover:brightness-125 transition-all ml-sm">STOP</button>
+<button id="replay-slower-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">×0.5</button>
+<button id="replay-pause-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">إيقاف مؤقت</button>
+<button id="replay-faster-btn" class="font-label-mono text-[10px] px-2 py-1 rounded-full bg-black/20 text-on-primary-container hover:brightness-125 transition-all">×2</button>
+<button id="replay-stop-btn" class="font-label-mono text-[10px] px-3 py-1 rounded-full bg-black/30 text-on-primary-container hover:brightness-125 transition-all ml-sm">إيقاف</button>
 </div>
 </div>
 <!-- Main Game Arena -->
@@ -339,8 +340,8 @@
 <!-- Red Reserve (Left) -->
 <aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-2 lg:order-1">
 <div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest">Player One</h3>
-<span class="font-label-mono text-[10px] opacity-60">SCORE: 1420</span>
+<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest">اللاعب الأول</h3>
+<span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٤٢٠</span>
 </div>
 <div class="bg-surface-container p-3 rounded-lg w-full">
 <div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="red-reserve"></div>
@@ -378,24 +379,24 @@
 <div class="mt-lg flex flex-wrap justify-center gap-md items-center">
 <div class="flex items-center gap-sm">
 <div class="w-4 h-4 rounded-full piece-red"></div>
-<span class="font-label-mono text-label-mono" id="p1-count">P1: 24</span>
+<span class="font-label-mono text-label-mono" id="p1-count">لاعب ١: ٢٤</span>
 </div>
-<div class="font-label-mono text-label-mono px-4 py-1 bg-primary text-on-primary rounded-full animate-pulse" id="turn-indicator">YOUR TURN</div>
+<div class="font-label-mono text-label-mono px-4 py-1 bg-primary text-on-primary rounded-full animate-pulse" id="turn-indicator">دورك</div>
 <div class="flex items-center gap-sm">
 <div class="w-4 h-4 rounded-full piece-black"></div>
-<span class="font-label-mono text-label-mono" id="p2-count">P2: 24</span>
+<span class="font-label-mono text-label-mono" id="p2-count">لاعب ٢: ٢٤</span>
 </div>
 <button id="undo-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-UNDO
+تراجع
 </button>
 <button id="fill-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-FILL
+تعبئة
 </button>
 <button id="exchange-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-EXCHANGE
+تبادل
 </button>
 <button id="example-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-container text-primary rounded-full hover:brightness-125 active:scale-95 transition-all border border-primary/40">
-LOAD EXAMPLE
+تحميل مثال
 </button>
 </div>
 <div class="mt-sm font-label-mono text-[10px] opacity-60 text-center" id="move-note"></div>
@@ -403,8 +404,8 @@ LOAD EXAMPLE
 <!-- Black Reserve (Right) -->
 <aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-3">
 <div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest">Player Two</h3>
-<span class="font-label-mono text-[10px] opacity-60">SCORE: 1395</span>
+<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest">اللاعب الثاني</h3>
+<span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٣٩٥</span>
 </div>
 <div class="bg-surface-container p-3 rounded-lg w-full">
 <div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="black-reserve"></div>
@@ -433,11 +434,11 @@ LOAD EXAMPLE
 <div class="flex gap-lg items-center w-full">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined text-sm opacity-50">info</span>
-<span class="font-label-mono text-[10px] opacity-50">7X7 TACTICAL GRID ACTIVE | MOVE: SELECT UNIT THEN DESTINATION SQUARE</span>
+<span class="font-label-mono text-[10px] opacity-50">شبكة تكتيكية ٧×٧ نشطة | الحركة: اختر القطعة ثم مربع الوجهة</span>
 </div>
 <div class="ml-auto flex gap-md">
-<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">FLIP BOARD</button>
-<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">ABANDON MATCH</button>
+<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">قلب اللوحة</button>
+<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">التخلي عن المباراة</button>
 </div>
 </div>
 </footer>
@@ -1039,7 +1040,8 @@ PLAY AGAIN
             exchangeBtnEl.classList.remove('opacity-40', 'cursor-not-allowed');
         } else {
             exchangeBtnEl.textContent = 'EXCHANGE';
-            const canStartExchange = state.phase === 'movement' && !state.forcedPiece && state.onBoard[state.current] >= 3;
+            const canStartExchange = state.phase === 'movement' && !state.forcedPiece &&
+                state.onBoard[state.current] >= 3 && hasAnyValidExchangeTarget(state.current);
             exchangeBtnEl.disabled = !canStartExchange;
             exchangeBtnEl.classList.toggle('opacity-40', !canStartExchange);
             exchangeBtnEl.classList.toggle('cursor-not-allowed', !canStartExchange);
@@ -1530,6 +1532,21 @@ PLAY AGAIN
         return isPermanentlyConfined(row, col);
     }
 
+    // Scans the whole board for at least one opponent piece the given color could
+    // legally target with an Exchange right now. Used to keep the Exchange button
+    // disabled whenever using it isn't actually possible.
+    function hasAnyValidExchangeTarget(color) {
+        const opponent = otherPlayer(color);
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                if (state.board[row][col] === opponent && isPermanentlyConfined(row, col)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     // Does THIS SPECIFIC PIECE (currently at row,col) have any legal adjacent move that
     // would result in a capture? Used to decide whether the SAME piece earns another move
     // right after it just captured — no other piece on the board is considered.
@@ -1547,6 +1564,7 @@ PLAY AGAIN
         if (state.phase !== 'movement') return;
         if (state.forcedPiece) return;              // can't interrupt a forced capture-chain
         if (state.onBoard[state.current] < 3) return; // must have at least 1 piece left after sacrificing 2 (0 pieces = a loss)
+        if (!hasAnyValidExchangeTarget(state.current)) return; // nothing legal to target right now
 
         state.moveSelected = null;
         state.exchangeMode = 'select-sacrifice';
