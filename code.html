@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>STRATAGEM | Tactical Mastery</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..800&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&amp;family=JetBrains+Mono:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-primary": "#690007",
+                    "on-secondary": "#2f3131",
+                    "on-primary-fixed": "#410003",
+                    "surface": "#131313",
+                    "background": "#131313",
+                    "surface-dim": "#131313",
+                    "surface-bright": "#393939",
+                    "inverse-surface": "#e5e2e1",
+                    "on-surface-variant": "#e3beba",
+                    "on-tertiary-container": "#e1dede",
+                    "tertiary-fixed-dim": "#c8c6c5",
+                    "secondary-container": "#454747",
+                    "surface-container-highest": "#353535",
+                    "error": "#ffb4ab",
+                    "tertiary-container": "#636262",
+                    "on-tertiary-fixed-variant": "#474646",
+                    "surface-container-high": "#2a2a2a",
+                    "surface-container-lowest": "#0e0e0e",
+                    "error-container": "#93000a",
+                    "on-background": "#e5e2e1",
+                    "secondary-fixed": "#e2e2e2",
+                    "inverse-on-surface": "#303030",
+                    "tertiary-fixed": "#e5e2e1",
+                    "inverse-primary": "#b72021",
+                    "on-tertiary": "#313030",
+                    "on-primary-container": "#ffd6d2",
+                    "outline": "#aa8985",
+                    "primary-fixed-dim": "#ffb4ac",
+                    "surface-container": "#202020",
+                    "on-secondary-fixed": "#1a1c1c",
+                    "secondary": "#c6c6c6",
+                    "outline-variant": "#5b403d",
+                    "on-primary-fixed-variant": "#93000e",
+                    "on-secondary-container": "#b5b5b5",
+                    "on-surface": "#e5e2e1",
+                    "primary-fixed": "#ffdad6",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "surface-variant": "#353535",
+                    "on-tertiary-fixed": "#1c1b1b",
+                    "on-error": "#690005",
+                    "on-error-container": "#ffdad6",
+                    "on-secondary-fixed-variant": "#454747",
+                    "tertiary": "#c8c6c5",
+                    "surface-container-low": "#1b1b1c",
+                    "surface-tint": "#ffb4ac",
+                    "primary": "#ffb4ac",
+                    "primary-container": "#be2525"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "md": "16px",
+                    "lg": "24px",
+                    "unit": "4px",
+                    "xl": "48px",
+                    "xs": "4px",
+                    "sm": "8px",
+                    "board-margin": "32px",
+                    "container-gap": "20px"
+            },
+            "fontFamily": {
+                    "body-sm": ["Geist"],
+                    "headline-md": ["Geist"],
+                    "headline-sm": ["Geist"],
+                    "label-mono": ["JetBrains Mono"],
+                    "headline-md-mobile": ["Geist"],
+                    "display-lg": ["Geist"],
+                    "body-md": ["Geist"]
+            },
+            "fontSize": {
+                    "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "headline-sm": ["18px", {"lineHeight": "1.4", "fontWeight": "600"}],
+                    "label-mono": ["12px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-md-mobile": ["20px", {"lineHeight": "1.2", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      
+      .game-board {
+        aspect-ratio: 1 / 1;
+        background-color: #2A2A2A;
+      }
+
+      .board-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        grid-template-rows: repeat(7, 1fr);
+      }
+
+      .square-light,
+      .square-dark {
+        background-color: #f5f5f5;
+        border: 1px solid rgba(0,0,0,0.12);
+      }
+
+      .square-center {
+        background-color: #f7c948; /* yellow */
+        box-shadow: inset 0 0 15px rgba(0,0,0,0.3);
+      }
+
+      .piece-red {
+        background: radial-gradient(circle at 35% 35%, #e53935, #be2525 60%, #7f1d1d);
+        box-shadow: inset -2px -2px 6px rgba(0,0,0,0.4), 0 4px 6px rgba(0,0,0,0.3);
+      }
+
+      .piece-black {
+        background: radial-gradient(circle at 35% 35%, #333, #121212 70%, #000);
+        box-shadow: inset -1px -1px 4px rgba(255,255,255,0.1), 0 4px 6px rgba(0,0,0,0.5);
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% { box-shadow: 0 0 5px 2px rgba(255,255,255,0.3); }
+        50% { box-shadow: 0 0 20px 8px rgba(255,255,255,0.6); }
+      }
+
+      .highlight-valid {
+        animation: pulse-glow 2s infinite ease-in-out;
+        z-index: 10;
+        border: 2px solid rgba(255,255,255,0.8);
+      }
+
+      body {
+        background-color: #1E1E1E;
+        color: #e5e2e1;
+      }
+
+      /* Hide scrollbar for a clean tabletop feel */
+      ::-webkit-scrollbar {
+        display: none;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface-container-low border-b border-white/5">
+<div class="flex items-center gap-md">
+<button class="p-2 text-primary hover:bg-surface-bright/10 transition-colors rounded-full active:opacity-80 active:scale-95 transition-all">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md font-bold tracking-tighter text-on-surface">STRATAGEM</h1>
+</div>
+<div class="flex items-center gap-md">
+<div class="hidden md:flex items-center gap-lg mr-lg">
+<span class="font-label-mono text-label-mono text-primary cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">MATCH</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">REPLAY</span>
+<span class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">RANKINGS</span>
+</div>
+<button class="p-2 text-on-surface-variant hover:bg-surface-bright/10 transition-colors rounded-full">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</div>
+</header>
+<!-- Main Game Arena -->
+<main class="flex-grow flex flex-col items-center justify-center pt-24 pb-32 px-md overflow-y-auto">
+<div class="w-full max-w-7xl flex flex-col items-center gap-xl">
+<!-- Board + Side Reserves -->
+<div class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-lg">
+<!-- Red Reserve (Left) -->
+<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-2 lg:order-1">
+<div class="w-full flex flex-col items-center gap-1 mb-1">
+<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest">Player One</h3>
+<span class="font-label-mono text-[10px] opacity-60">SCORE: 1420</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg w-full">
+<div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="red-reserve"></div>
+</div>
+</aside>
+<!-- Centerpiece: The Board -->
+<section class="flex flex-col items-center w-full max-w-[550px] order-1 lg:order-2">
+<div class="relative w-full bg-surface-container-highest p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<!-- Board Coordinates - Letters -->
+<div class="flex justify-around px-8 mb-2">
+<span class="font-label-mono text-[10px] opacity-40">A</span>
+<span class="font-label-mono text-[10px] opacity-40">B</span>
+<span class="font-label-mono text-[10px] opacity-40">C</span>
+<span class="font-label-mono text-[10px] opacity-40">D</span>
+<span class="font-label-mono text-[10px] opacity-40">E</span>
+<span class="font-label-mono text-[10px] opacity-40">F</span>
+<span class="font-label-mono text-[10px] opacity-40">G</span>
+</div>
+<div class="flex">
+<!-- Board Coordinates - Numbers -->
+<div class="flex flex-col justify-around pr-3 py-4">
+<span class="font-label-mono text-[10px] opacity-40">7</span>
+<span class="font-label-mono text-[10px] opacity-40">6</span>
+<span class="font-label-mono text-[10px] opacity-40">5</span>
+<span class="font-label-mono text-[10px] opacity-40">4</span>
+<span class="font-label-mono text-[10px] opacity-40">3</span>
+<span class="font-label-mono text-[10px] opacity-40">2</span>
+<span class="font-label-mono text-[10px] opacity-40">1</span>
+</div>
+<!-- 7x7 Grid -->
+<div class="game-board board-grid w-full rounded-lg overflow-hidden border border-white/5" id="board"></div>
+</div>
+</div>
+<!-- Match Status Info -->
+<div class="mt-lg flex flex-wrap justify-center gap-md items-center">
+<div class="flex items-center gap-sm">
+<div class="w-4 h-4 rounded-full piece-red"></div>
+<span class="font-label-mono text-label-mono" id="p1-count">P1: 24</span>
+</div>
+<div class="font-label-mono text-label-mono px-4 py-1 bg-primary text-on-primary rounded-full animate-pulse" id="turn-indicator">YOUR TURN</div>
+<div class="flex items-center gap-sm">
+<div class="w-4 h-4 rounded-full piece-black"></div>
+<span class="font-label-mono text-label-mono" id="p2-count">P2: 24</span>
+</div>
+<button id="undo-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+UNDO
+</button>
+<button id="fill-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+FILL
+</button>
+<button id="exchange-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+EXCHANGE
+</button>
+<button id="example-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-container text-primary rounded-full hover:brightness-125 active:scale-95 transition-all border border-primary/40">
+LOAD EXAMPLE
+</button>
+</div>
+<div class="mt-sm font-label-mono text-[10px] opacity-60 text-center" id="move-note"></div>
+</section>
+<!-- Black Reserve (Right) -->
+<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-3">
+<div class="w-full flex flex-col items-center gap-1 mb-1">
+<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest">Player Two</h3>
+<span class="font-label-mono text-[10px] opacity-60">SCORE: 1395</span>
+</div>
+<div class="bg-surface-container p-3 rounded-lg w-full">
+<div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="black-reserve"></div>
+</div>
+</aside>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-md py-sm bg-surface-container-lowest shadow-lg border-t border-white/5">
+<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full p-2 scale-90 duration-150">
+<span class="material-symbols-outlined">grid_view</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
+<span class="material-symbols-outlined">leaderboard</span>
+</div>
+<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
+<span class="material-symbols-outlined">person</span>
+</div>
+</nav>
+<!-- Footer / Tooltip Bar (Desktop) -->
+<footer class="hidden md:flex fixed bottom-0 left-0 w-full h-12 bg-surface-container-lowest items-center px-lg border-t border-white/5">
+<div class="flex gap-lg items-center w-full">
+<div class="flex items-center gap-xs">
+<span class="material-symbols-outlined text-sm opacity-50">info</span>
+<span class="font-label-mono text-[10px] opacity-50">7X7 TACTICAL GRID ACTIVE | MOVE: SELECT UNIT THEN DESTINATION SQUARE</span>
+</div>
+<div class="ml-auto flex gap-md">
+<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">FLIP BOARD</button>
+<button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">ABANDON MATCH</button>
+</div>
+</div>
+</footer>
+<script>
+    /* ============================================================
+       STRATAGEM — Game Logic
+       PLACEMENT PHASE
+       - 7x7 board, center square (3,3) is blocked for placement
+       - Each player starts with 24 pieces in reserve
+       - Flow: SELECT a piece from your reserve, then click a
+         DESTINATION square to place it. Valid squares glow while
+         a piece is selected.
+       - Each turn a player places exactly 2 pieces
+       - Turn passes after 2 placements (or sooner if reserve
+         runs out mid-turn)
+       - When both reserves hit 0 (including via the FILL button),
+         placement ends and the movement phase begins
+
+       MOVEMENT PHASE
+       - Flow: click one of your own pieces to select it, then
+         click a free, orthogonally-adjacent square to move it
+         there (up/down/left/right only — no diagonals)
+       - The center square is now open and can be moved onto
+       - One move per turn, then the turn passes
+       - If a player has no legal move, their turn is auto-skipped;
+         if neither player can move, the phase stalls out
+       - A player loses the instant they have zero pieces left on the board.
+       
+       CAPTURES
+       - After a move, check all 4 directions from the piece's new
+         square for the exact pattern X-O-X (one opponent piece
+         immediately flanked by two of the mover's pieces)
+       - A run of 2+ opponent pieces in a row is NEVER captured,
+         even if bounded on both ends (e.g. red-black-black-red
+         is not a valid capture)
+       - Multiple separate single-piece sandwiches can be captured
+         at once if one move creates more than one of them
+       - BONUS TURN: after a capturing move, if that SAME PIECE
+         (from its new square) still has another capturing move
+         available, it must be that exact piece that moves again —
+         no other piece on the board may move during the bonus
+         turn. This chains until that piece makes a move that
+         doesn't result in a capture — only then does the turn
+         pass normally.
+
+       EXCHANGE (anti-stalemate mechanic)
+       - Usable anytime on your turn during the movement phase, in
+         place of a normal move. Not usable mid capture-chain
+         (while a forced piece bonus turn is in progress).
+       - Requires at least 3 of your own pieces on the board. Since
+         a player loses at 0 pieces, sacrificing 2 must
+         always leave at least 1 behind — so you can never trigger
+         your own loss as a side effect of using the feature.
+       - Flow: click EXCHANGE -> pick exactly 2 of your own pieces
+         anywhere on the board to sacrifice -> then pick one
+         opponent piece to remove.
+       - A valid target is any opponent piece that is permanently
+         confined to a pocket of at least 2 reachable empty squares
+         (found by flood-filling from its own square through empty
+         cells only, treating every occupied cell as a wall) AND
+         whose entire bordering wall is made of pieces of its OWN
+         color. Both conditions are required:
+           1. Reachable pocket size is at least 2 (it can only ever
+              shuttle within those cells forever, never reach
+              the open board).
+           2. Every occupied square bordering that pocket belongs to
+              the trapped piece's own color, not the opponent's. A
+              wall that includes even one opponent-colored piece
+              does NOT qualify — that piece is one the opponent
+              controls and could reposition later, and it already
+              sits one step from a capture, so the confinement isn't
+              actually permanent.
+         This is NOT the same as "currently safe from capture": a
+         piece with wide-open board space around it does not qualify
+         just because it happens to be safe this turn, and a piece
+         in a 2-or-more-square pocket walled in partly by the opponent's own
+         pieces doesn't qualify either. If several opponent pieces
+         qualify, all are highlighted and you pick which one to take.
+       - Executing an Exchange removes the 2 sacrificed pieces and
+         the 1 targeted piece, then ends your turn immediately
+         (no bonus turn afterward).
+       ============================================================ */
+
+    const BOARD_SIZE = 7;
+    const CENTER = { row: 3, col: 3 };
+
+    const state = {
+        board: Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null)), // null | 'red' | 'black'
+        reserves: { red: 24, black: 24 },
+        onBoard: { red: 0, black: 0 },  // live piece counts on the board (movement phase onward)
+        current: 'red',        // whose turn it is
+        placedThisTurn: 0,     // 0, 1, or 2 (placement phase)
+        phase: 'placement',    // 'placement' | 'movement' | 'movement-stalemate' | 'game-over'
+        selected: false,       // true when the current player has picked up a piece from reserve (placement phase)
+        moveSelected: null,    // { row, col } of the board piece picked up to move (movement phase)
+        forcedPiece: null,     // { row, col } — during a capture bonus turn, only this piece may move
+        exchangeMode: null,    // null | 'select-sacrifice' | 'select-target'
+        exchangeSacrifice: [], // array of { row, col } — up to 2 of the current player's own pieces marked to sacrifice
+        skipNote: '',          // transient message, e.g. auto-skip or capture notice
+        winner: null            // 'red' | 'black' once phase === 'game-over'
+    };
+
+    // Undo history — a stack of full state snapshots taken right before each
+    // game-changing action (a placement, a move, or a full auto-fill).
+    const history = [];
+
+    function pushHistory() {
+        history.push(JSON.stringify(state));
+    }
+
+    function undo() {
+        if (history.length === 0) return;
+        const prev = JSON.parse(history.pop());
+        Object.assign(state, prev);
+        render();
+    }
+
+    const boardEl = document.getElementById('board');
+    const redReserveEl = document.getElementById('red-reserve');
+    const blackReserveEl = document.getElementById('black-reserve');
+    const turnIndicatorEl = document.getElementById('turn-indicator');
+    const p1CountEl = document.getElementById('p1-count');
+    const p2CountEl = document.getElementById('p2-count');
+    const fillBtnEl = document.getElementById('fill-btn');
+    const undoBtnEl = document.getElementById('undo-btn');
+    const exchangeBtnEl = document.getElementById('exchange-btn');
+    const exampleBtnEl = document.getElementById('example-btn');
+    const moveNoteEl = document.getElementById('move-note');
+
+    function isCenter(row, col) {
+        return row === CENTER.row && col === CENTER.col;
+    }
+
+    function squareEl(row, col) {
+        return boardEl.children[row * BOARD_SIZE + col];
+    }
+
+    function buildBoard() {
+        boardEl.innerHTML = '';
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                const isLight = (row + col) % 2 === 0;
+                const center = isCenter(row, col);
+                const squareClass = center ? 'square-center' : (isLight ? 'square-light' : 'square-dark');
+                const div = document.createElement('div');
+                div.className = `relative ${squareClass} flex items-center justify-center transition-all aspect-square`;
+                div.dataset.row = row;
+                div.dataset.col = col;
+                div.addEventListener('mouseenter', () => div.classList.add('brightness-125'));
+                div.addEventListener('mouseleave', () => div.classList.remove('brightness-125'));
+                div.addEventListener('click', () => handleSquareClick(row, col));
+                boardEl.appendChild(div);
+            }
+        }
+    }
+
+    function getOrthogonalNeighbors(row, col) {
+        return [
+            { row: row - 1, col },
+            { row: row + 1, col },
+            { row, col: col - 1 },
+            { row, col: col + 1 }
+        ].filter(({ row: r, col: c }) => r >= 0 && r < BOARD_SIZE && c >= 0 && c < BOARD_SIZE);
+    }
+
+    function renderBoard() {
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                const el = squareEl(row, col);
+                const existingPiece = el.querySelector('.game-piece');
+                if (existingPiece) existingPiece.remove();
+
+                const occupant = state.board[row][col];
+                const isMarkedSacrifice = state.exchangeSacrifice.some(p => p.row === row && p.col === col);
+                if (occupant) {
+                    const piece = document.createElement('div');
+                    const isSelectedPiece = state.phase === 'movement' && state.moveSelected &&
+                        state.moveSelected.row === row && state.moveSelected.col === col;
+                    piece.className = [
+                        'game-piece w-[70%] h-[70%] rounded-full',
+                        occupant === 'red' ? 'piece-red' : 'piece-black',
+                        isSelectedPiece ? 'ring-2 ring-white scale-110' : '',
+                        isMarkedSacrifice ? 'ring-4 ring-dashed ring-yellow-400 opacity-50' : ''
+                    ].join(' ');
+                    el.appendChild(piece);
+                }
+
+                // Placement phase: glow every free, non-center square while a reserve piece is picked up
+                const isValidPlacement = state.phase === 'placement' && state.selected && !occupant && !isCenter(row, col);
+
+                // Movement phase: glow only the free squares orthogonally adjacent to the selected piece
+                let isValidMoveTarget = false;
+                if (state.phase === 'movement' && !state.exchangeMode && state.moveSelected && !occupant) {
+                    const neighbors = getOrthogonalNeighbors(state.moveSelected.row, state.moveSelected.col);
+                    isValidMoveTarget = neighbors.some(n => n.row === row && n.col === col);
+                    
+                    // NEW RULE: During a forced bonus turn, the move MUST result in a capture.
+                    if (isValidMoveTarget && state.forcedPiece) {
+                        isValidMoveTarget = wouldCaptureIfMoved(state.moveSelected.row, state.moveSelected.col, row, col, state.current);
+                    }
+                }
+
+                // Exchange mode: glow opponent pieces that are valid sacrifice targets (un-eatable this turn)
+                const isValidExchangeTargetSquare = state.exchangeMode === 'select-target' &&
+                    occupant === otherPlayer(state.current) && isValidExchangeTarget(row, col);
+
+                const isValidTarget = isValidPlacement || isValidMoveTarget || isValidExchangeTargetSquare;
+                el.classList.toggle('highlight-valid', isValidTarget);
+
+                // A square is clickable if it's a valid placement/move/exchange-target square, OR it
+                // holds a piece belonging to the current player during the movement phase (to pick it
+                // up for a move, or mark it for sacrifice). During a forced-piece bonus turn, only the
+                // forced piece itself is pickable. During exchange target selection, own pieces are
+                // no longer clickable — only valid opponent targets are.
+                const isOwnMovablePiece = state.phase === 'movement' && !state.exchangeMode && occupant === state.current &&
+                    (!state.forcedPiece || (state.forcedPiece.row === row && state.forcedPiece.col === col));
+                const isOwnSacrificeCandidate = state.exchangeMode === 'select-sacrifice' && occupant === state.current;
+                el.classList.toggle('cursor-pointer', isValidTarget || isOwnMovablePiece || isOwnSacrificeCandidate);
+            }
+        }
+    }
+
+    function renderReserve(container, color, count) {
+        container.innerHTML = '';
+        const isActivePlayer = state.phase === 'placement' && state.current === color;
+        for (let i = 0; i < count; i++) {
+            const piece = document.createElement('div');
+            const isLifted = isActivePlayer && state.selected && i === count - 1; // the "picked up" piece is the top of the stack
+            piece.className = [
+                'w-6 h-6 md:w-8 md:h-8 rounded-full transition-transform',
+                color === 'red' ? 'piece-red' : 'piece-black',
+                isActivePlayer ? 'cursor-pointer hover:scale-110' : 'opacity-40',
+                isLifted ? 'ring-2 ring-white -translate-y-1 scale-110' : ''
+            ].join(' ');
+            if (isActivePlayer) {
+                piece.addEventListener('click', () => handleReserveClick(color, i));
+            }
+            container.appendChild(piece);
+        }
+    }
+
+    function renderStatus() {
+        if (state.phase === 'placement') {
+            p1CountEl.textContent = `P1: ${state.reserves.red}`;
+            p2CountEl.textContent = `P2: ${state.reserves.black}`;
+        } else {
+            p1CountEl.textContent = `P1: ${state.onBoard.red}`;
+            p2CountEl.textContent = `P2: ${state.onBoard.black}`;
+        }
+
+        if (state.phase === 'placement') {
+            fillBtnEl.disabled = false;
+            fillBtnEl.classList.remove('opacity-40', 'cursor-not-allowed');
+        } else {
+            fillBtnEl.disabled = true;
+            fillBtnEl.classList.add('opacity-40', 'cursor-not-allowed');
+        }
+
+        undoBtnEl.disabled = history.length === 0;
+        undoBtnEl.classList.toggle('opacity-40', history.length === 0);
+        undoBtnEl.classList.toggle('cursor-not-allowed', history.length === 0);
+
+        if (state.exchangeMode) {
+            exchangeBtnEl.textContent = 'CANCEL EXCHANGE';
+            exchangeBtnEl.disabled = false;
+            exchangeBtnEl.classList.remove('opacity-40', 'cursor-not-allowed');
+        } else {
+            exchangeBtnEl.textContent = 'EXCHANGE';
+            const canStartExchange = state.phase === 'movement' && !state.forcedPiece && state.onBoard[state.current] >= 3;
+            exchangeBtnEl.disabled = !canStartExchange;
+            exchangeBtnEl.classList.toggle('opacity-40', !canStartExchange);
+            exchangeBtnEl.classList.toggle('cursor-not-allowed', !canStartExchange);
+        }
+
+        if (state.phase === 'placement') {
+            const label = state.current === 'red' ? "PLAYER ONE'S TURN" : "PLAYER TWO'S TURN";
+            const hint = state.selected ? ' — CHOOSE A SQUARE' : ' — SELECT A PIECE';
+            turnIndicatorEl.textContent = `${label} (${state.placedThisTurn}/2)${hint}`;
+            turnIndicatorEl.classList.add('animate-pulse', 'bg-primary', 'text-on-primary');
+            turnIndicatorEl.classList.remove('bg-surface-bright', 'text-on-surface');
+        } else if (state.phase === 'movement') {
+            const label = state.current === 'red' ? "PLAYER ONE'S TURN" : "PLAYER TWO'S TURN";
+            let hint;
+            if (state.exchangeMode === 'select-sacrifice') {
+                hint = ` — SACRIFICE 2 OF YOUR PIECES (${state.exchangeSacrifice.length}/2)`;
+            } else if (state.exchangeMode === 'select-target') {
+                hint = ' — CHOOSE AN OPPONENT PIECE TO CAPTURE';
+            } else if (state.forcedPiece) {
+                hint = ' — MUST CONTINUE EATING WITH THIS PIECE';
+            } else {
+                hint = state.moveSelected ? ' — CHOOSE DESTINATION' : ' — SELECT A PIECE TO MOVE';
+            }
+            turnIndicatorEl.textContent = `${label}${hint}`;
+            turnIndicatorEl.classList.add('animate-pulse', 'bg-primary', 'text-on-primary');
+            turnIndicatorEl.classList.remove('bg-surface-bright', 'text-on-surface');
+        } else if (state.phase === 'movement-stalemate') {
+            turnIndicatorEl.textContent = 'NO LEGAL MOVES FOR EITHER PLAYER';
+            turnIndicatorEl.classList.remove('animate-pulse', 'bg-primary', 'text-on-primary');
+            turnIndicatorEl.classList.add('bg-surface-bright', 'text-on-surface');
+        } else if (state.phase === 'game-over') {
+            const winnerLabel = state.winner === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            turnIndicatorEl.textContent = `${winnerLabel} WINS!`;
+            turnIndicatorEl.classList.remove('animate-pulse', 'bg-surface-bright', 'text-on-surface');
+            turnIndicatorEl.classList.add('bg-primary', 'text-on-primary');
+        }
+
+        moveNoteEl.textContent = state.skipNote;
+    }
+
+    function render() {
+        renderBoard();
+        renderReserve(redReserveEl, 'red', state.reserves.red);
+        renderReserve(blackReserveEl, 'black', state.reserves.black);
+        renderStatus();
+    }
+
+    function otherPlayer(p) {
+        return p === 'red' ? 'black' : 'red';
+    }
+
+    function hasAnyLegalMove(color) {
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                if (state.board[row][col] !== color) continue;
+                const neighbors = getOrthogonalNeighbors(row, col);
+                const canMove = neighbors.some(n => state.board[n.row][n.col] === null);
+                if (canMove) return true;
+            }
+        }
+        return false;
+    }
+
+    // Passes the turn to the other player, auto-skipping if that player has
+    // no legal move at all. If neither player can move, the phase stalls out.
+    function advanceMovementTurn() {
+        state.forcedPiece = null;
+        state.current = otherPlayer(state.current);
+
+        if (!hasAnyLegalMove(state.current)) {
+            const skippedLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            state.skipNote = `${skippedLabel} HAS NO LEGAL MOVES — TURN SKIPPED`;
+            state.current = otherPlayer(state.current);
+
+            // If the other player also can't move, the game is stuck
+            if (!hasAnyLegalMove(state.current)) {
+                state.phase = 'movement-stalemate';
+            }
+        } else {
+            state.skipNote = '';
+        }
+
+        render();
+    }
+
+    function countOnBoard(color) {
+        let count = 0;
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                if (state.board[row][col] === color) count++;
+            }
+        }
+        return count;
+    }
+
+    function beginMovementPhase() {
+        state.phase = 'movement';
+        state.moveSelected = null;
+        state.forcedPiece = null;
+        state.skipNote = '';
+        state.onBoard.red = countOnBoard('red');
+        state.onBoard.black = countOnBoard('black');
+
+        // If whoever's turn it naturally is can't move, skip forward same as mid-game
+        if (!hasAnyLegalMove(state.current)) {
+            const skippedLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            state.skipNote = `${skippedLabel} HAS NO LEGAL MOVES — TURN SKIPPED`;
+            state.current = otherPlayer(state.current);
+            if (!hasAnyLegalMove(state.current)) {
+                state.phase = 'movement-stalemate';
+            }
+        }
+
+        render();
+    }
+
+    function endTurn() {
+        state.placedThisTurn = 0;
+        state.selected = false;
+        state.current = otherPlayer(state.current);
+
+        // If the new current player has no pieces left, skip to the one who does
+        if (state.reserves[state.current] === 0 && state.reserves[otherPlayer(state.current)] > 0) {
+            state.current = otherPlayer(state.current);
+        }
+    }
+
+    function checkPlacementComplete() {
+        if (state.reserves.red === 0 && state.reserves.black === 0) {
+            state.phase = 'placement-complete';
+            state.selected = false;
+            nextPhase();
+            return true;
+        }
+        return false;
+    }
+
+    function handleReserveClick(color, index) {
+        if (state.phase !== 'placement') return;
+        if (color !== state.current) return;           // can only pick up your own pieces
+        if (state.reserves[color] <= 0) return;
+
+        // Clicking the already-selected (top) piece puts it back down
+        const isTopPiece = index === state.reserves[color] - 1;
+        if (state.selected && isTopPiece) {
+            state.selected = false;
+        } else {
+            state.selected = true;
+        }
+        render();
+    }
+
+    function handleSquareClick(row, col) {
+        if (state.phase === 'placement') {
+            handlePlacementSquareClick(row, col);
+        } else if (state.phase === 'movement') {
+            if (state.exchangeMode === 'select-sacrifice') {
+                handleExchangeSacrificeClick(row, col);
+            } else if (state.exchangeMode === 'select-target') {
+                handleExchangeTargetClick(row, col);
+            } else {
+                handleMovementSquareClick(row, col);
+            }
+        }
+    }
+
+    function handlePlacementSquareClick(row, col) {
+        if (!state.selected) return;                     // must pick up a piece first
+        if (isCenter(row, col)) return;                  // center is never placeable
+        if (state.board[row][col] !== null) return;       // must be a free square
+
+        pushHistory();
+
+        // Place the piece
+        state.board[row][col] = state.current;
+        state.reserves[state.current]--;
+        state.placedThisTurn++;
+        state.selected = false;
+
+        render();
+
+        if (checkPlacementComplete()) return;
+
+        // Turn passes once the player has placed 2 pieces,
+        // or immediately if their reserve just ran out mid-turn
+        if (state.placedThisTurn >= 2 || state.reserves[state.current] === 0) {
+            endTurn();
+            render();
+        }
+    }
+
+    function handleMovementSquareClick(row, col) {
+        const occupant = state.board[row][col];
+
+        // Clicking one of your own pieces picks it up (or puts it back down if already selected).
+        // During a forced-piece bonus turn, only the forced piece itself may be picked up —
+        // clicks on any other own piece are ignored.
+        if (occupant === state.current) {
+            if (state.forcedPiece && !(state.forcedPiece.row === row && state.forcedPiece.col === col)) {
+                return;
+            }
+            if (state.moveSelected && state.moveSelected.row === row && state.moveSelected.col === col) {
+                state.moveSelected = null; // deselect
+            } else {
+                state.moveSelected = { row, col };
+            }
+            render();
+            return;
+        }
+
+        // Otherwise, only act if a piece is currently selected and this is a valid destination
+        if (!state.moveSelected) return;
+        if (occupant !== null) return;              // must be free (center included — it's open in the movement phase)
+
+        const neighbors = getOrthogonalNeighbors(state.moveSelected.row, state.moveSelected.col);
+        const isAdjacent = neighbors.some(n => n.row === row && n.col === col);
+        if (!isAdjacent) return;                      // must be exactly one orthogonal step away
+
+        // NEW RULE: During a bonus turn, reject any move that does not result in a capture
+        if (state.forcedPiece) {
+            if (!wouldCaptureIfMoved(state.moveSelected.row, state.moveSelected.col, row, col, state.current)) {
+                return; 
+            }
+        }
+
+        pushHistory();
+
+        // Execute the move — one move per turn
+        state.board[row][col] = state.current;
+        state.board[state.moveSelected.row][state.moveSelected.col] = null;
+        state.moveSelected = null;
+
+        // Check whether this move sandwiched any opposing piece(s) between two of the mover's pieces
+        const capturedCount = captureFlanks(row, col, state.current);
+        if (capturedCount > 0) {
+            const capLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            state.skipNote = `${capLabel} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''}!`;
+            state.onBoard[otherPlayer(state.current)] -= capturedCount;
+        } else {
+            state.skipNote = '';
+        }
+
+        render();
+
+        // Win condition: The instant a player reaches 0 pieces.
+        if (state.onBoard[otherPlayer(state.current)] === 0) {
+            state.phase = 'game-over';
+            state.winner = state.current;
+            render();
+            return;
+        }
+
+        // Bonus turn: if this move captured something AND that SAME PIECE (now sitting at
+        // row,col) still has another capturing move available from its new square, that exact
+        // piece must move again — no other piece on the board is eligible during the bonus
+        // turn. This repeats after every subsequent capture until a move by that piece fails
+        // to capture anything.
+        if (capturedCount > 0 && hasCapturingMoveForPiece(row, col, state.current)) {
+            state.forcedPiece = { row, col };
+            const label = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            state.skipNote = `${label} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''} — SAME PIECE CAN EAT AGAIN, GO AGAIN!`;
+            render();
+            return;
+        }
+
+        state.forcedPiece = null;
+        advanceMovementTurn();
+    }
+
+    // Looks outward from the piece that just moved, in all 4 orthogonal directions.
+    // Any unbroken run of opponent pieces immediately bounded by one of the mover's
+    // own pieces gets captured (removed from the board).
+    function captureFlanks(row, col, color) {
+        const opponent = otherPlayer(color);
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        const capturedCells = [];
+
+        for (const [dr, dc] of directions) {
+            const midRow = row + dr;
+            const midCol = col + dc;
+            const farRow = row + dr * 2;
+            const farCol = col + dc * 2;
+
+            const midInBounds = midRow >= 0 && midRow < BOARD_SIZE && midCol >= 0 && midCol < BOARD_SIZE;
+            const farInBounds = farRow >= 0 && farRow < BOARD_SIZE && farCol >= 0 && farCol < BOARD_SIZE;
+            if (!midInBounds || !farInBounds) continue;
+
+            // Valid capture requires EXACTLY one opponent piece immediately next to us,
+            // followed directly by one of our own pieces — i.e. "X O X".
+            // A run of two or more opponent pieces in a row ("X O O X") is never captured.
+            const isSingleSandwich = state.board[midRow][midCol] === opponent && state.board[farRow][farCol] === color;
+            if (isSingleSandwich) {
+                capturedCells.push({ row: midRow, col: midCol });
+            }
+        }
+
+        capturedCells.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
+        return capturedCells.length;
+    }
+
+    // Non-mutating check: how many single-piece sandwiches would exist at (row,col)
+    // for `color` given the CURRENT board state — used for simulating hypothetical moves.
+    function peekCaptureCount(row, col, color) {
+        const opponent = otherPlayer(color);
+        const directions = [[-1, 0], [1, 0], [0, -1], [0, 1]];
+        let count = 0;
+        for (const [dr, dc] of directions) {
+            const midRow = row + dr;
+            const midCol = col + dc;
+            const farRow = row + dr * 2;
+            const farCol = col + dc * 2;
+            const midInBounds = midRow >= 0 && midRow < BOARD_SIZE && midCol >= 0 && midCol < BOARD_SIZE;
+            const farInBounds = farRow >= 0 && farRow < BOARD_SIZE && farCol >= 0 && farCol < BOARD_SIZE;
+            if (!midInBounds || !farInBounds) continue;
+            if (state.board[midRow][midCol] === opponent && state.board[farRow][farCol] === color) count++;
+        }
+        return count;
+    }
+
+    // Temporarily plays out a candidate move to see if it would result in a capture,
+    // then restores the board exactly as it was.
+    function wouldCaptureIfMoved(fromRow, fromCol, toRow, toCol, color) {
+        const originalFrom = state.board[fromRow][fromCol];
+        const originalTo = state.board[toRow][toCol];
+        state.board[fromRow][fromCol] = null;
+        state.board[toRow][toCol] = color;
+        const count = peekCaptureCount(toRow, toCol, color);
+        state.board[fromRow][fromCol] = originalFrom;
+        state.board[toRow][toCol] = originalTo;
+        return count > 0;
+    }
+
+    // Flood-fills outward from a piece's own square through every empty cell it could ever
+    // reach by repeatedly moving, with every other piece treated as a fixed wall (occupied
+    // cells of EITHER color block the fill). Returns the full reachable set, including the
+    // piece's own starting square.
+    function getConfinementPocket(row, col) {
+        const startKey = `${row},${col}`;
+        const visited = new Set([startKey]);
+        const queue = [{ row, col }];
+
+        while (queue.length) {
+            const cur = queue.shift();
+            const neighbors = getOrthogonalNeighbors(cur.row, cur.col);
+            for (const n of neighbors) {
+                const key = `${n.row},${n.col}`;
+                if (visited.has(key)) continue;
+                if (state.board[n.row][n.col] === null) {
+                    visited.add(key);
+                    queue.push(n);
+                }
+            }
+        }
+
+        return visited;
+    }
+
+    // Given a confinement pocket (the set of squares returned by getConfinementPocket — the
+    // piece's own square plus every empty square it can reach), returns every occupied square
+    // that immediately borders the pocket from outside it. These bordering pieces are the
+    // "wall" that seals the pocket off. Board edges aren't part of the wall since they need no
+    // color and always seal on their own.
+    function getPocketWall(pocket) {
+        const wall = [];
+        const seen = new Set();
+        for (const key of pocket) {
+            const [r, c] = key.split(',').map(Number);
+            const neighbors = getOrthogonalNeighbors(r, c);
+            for (const n of neighbors) {
+                const nKey = `${n.row},${n.col}`;
+                if (pocket.has(nKey)) continue;               // inside the pocket itself, not a wall
+                if (state.board[n.row][n.col] === null) continue; // shouldn't happen — pocket is exhaustive — but guard anyway
+                if (seen.has(nKey)) continue;
+                seen.add(nKey);
+                wall.push({ row: n.row, col: n.col });
+            }
+        }
+        return wall;
+    }
+
+    // A confinement pocket only counts as a PERMANENT (Shape B) deadlock if every piece
+    // forming its boundary wall belongs to the SAME color as the trapped piece. A wall that
+    // includes even one opponent-colored piece isn't permanent: that piece is one the opponent
+    // controls and could move away or reposition on a later turn, and its presence on the
+    // boundary already puts an opponent piece one step from a capture. Only an all-own-color
+    // wall guarantees the opponent can never occupy any square in it.
+    function isWallSameColor(pocket, color) {
+        const wall = getPocketWall(pocket);
+        return wall.every(({ row, col }) => state.board[row][col] === color);
+    }
+
+    // A piece is permanently confined if BOTH:
+    //   1. The empty squares it could ever reach (via any sequence of its own moves)
+    //      number at least 2 — i.e. it's sealed into a pocket where it can only ever shuttle
+    //      within those cells forever, with no way to reach the open board.
+    //   2. The wall sealing that pocket is entirely the piece's own color, so the opponent can
+    //      never occupy any square in it — which is what makes the seal (and the impossibility
+    //      of ever completing a capture) actually permanent rather than just true this turn.
+    function isPermanentlyConfined(row, col) {
+        const color = state.board[row][col];
+        const pocket = getConfinementPocket(row, col);
+        if ((pocket.size - 1) < 2) return false; // subtract 1 for the piece's own starting square
+        return isWallSameColor(pocket, color);
+    }
+
+    // A valid EXCHANGE target: an opponent piece that is permanently confined to a pocket
+    // of >= 2 squares (see isPermanentlyConfined above) — genuinely stuck shuttling forever,
+    // not just momentarily safe from capture.
+    function isValidExchangeTarget(row, col) {
+        const opponent = otherPlayer(state.current);
+        if (state.board[row][col] !== opponent) return false;
+        return isPermanentlyConfined(row, col);
+    }
+
+    // Does THIS SPECIFIC PIECE (currently at row,col) have any legal adjacent move that
+    // would result in a capture? Used to decide whether the SAME piece earns another move
+    // right after it just captured — no other piece on the board is considered.
+    function hasCapturingMoveForPiece(row, col, color) {
+        const neighbors = getOrthogonalNeighbors(row, col);
+        for (const n of neighbors) {
+            if (state.board[n.row][n.col] === null && wouldCaptureIfMoved(row, col, n.row, n.col, color)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function startExchange() {
+        if (state.phase !== 'movement') return;
+        if (state.forcedPiece) return;              // can't interrupt a forced capture-chain
+        if (state.onBoard[state.current] < 3) return; // must have at least 1 piece left after sacrificing 2 (0 pieces = a loss)
+
+        state.moveSelected = null;
+        state.exchangeMode = 'select-sacrifice';
+        state.exchangeSacrifice = [];
+        state.skipNote = '';
+        render();
+    }
+
+    function cancelExchange() {
+        state.exchangeMode = null;
+        state.exchangeSacrifice = [];
+        state.skipNote = '';
+        render();
+    }
+
+    function handleExchangeSacrificeClick(row, col) {
+        const occupant = state.board[row][col];
+        if (occupant !== state.current) return; // must be one of your own pieces
+
+        const existingIndex = state.exchangeSacrifice.findIndex(p => p.row === row && p.col === col);
+        if (existingIndex !== -1) {
+            state.exchangeSacrifice.splice(existingIndex, 1); // clicking a marked piece again un-marks it
+            render();
+            return;
+        }
+
+        if (state.exchangeSacrifice.length >= 2) return; // already have both sacrifice pieces picked
+
+        state.exchangeSacrifice.push({ row, col });
+
+        if (state.exchangeSacrifice.length === 2) {
+            state.exchangeMode = 'select-target';
+        }
+        render();
+    }
+
+    function handleExchangeTargetClick(row, col) {
+        const opponent = otherPlayer(state.current);
+        if (state.board[row][col] !== opponent) return;
+        if (!isValidExchangeTarget(row, col)) return; // must be currently un-eatable through normal play
+
+        pushHistory();
+
+        // Remove the two sacrificed pieces
+        state.exchangeSacrifice.forEach(({ row: r, col: c }) => { state.board[r][c] = null; });
+        state.onBoard[state.current] -= 2;
+
+        // Remove the targeted opponent piece
+        state.board[row][col] = null;
+        state.onBoard[opponent] -= 1;
+
+        const label = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+        state.skipNote = `${label} SACRIFICED 2 PIECES IN AN EXCHANGE!`;
+
+        state.exchangeMode = null;
+        state.exchangeSacrifice = [];
+
+        render();
+
+        // Check both sides for a game-ending outcome
+        if (state.onBoard[opponent] === 0) {
+            state.phase = 'game-over';
+            state.winner = state.current;
+            render();
+            return;
+        }
+        if (state.onBoard[state.current] === 0) {
+            state.phase = 'game-over';
+            state.winner = opponent;
+            render();
+            return;
+        }
+
+        advanceMovementTurn();
+    }
+
+    // Builds a genuine confinement trap: a black piece walled into a 1-wide vertical corridor,
+    // capped top and bottom and flanked on both sides by OTHER BLACK pieces — leaving it
+    // at least 2 empty squares to ever shuttle between, sealed by a wall that is entirely its
+    // own color. Under isPermanentlyConfined (pocket size >= 2 AND same-color wall), this is
+    // precisely the case EXCHANGE exists to break: the opponent (red) can never occupy any
+    // square in that wall, so the seal — and the impossibility of ever capturing the trapped
+    // piece — is permanent. A separate, freely mobile black piece is placed elsewhere so the
+    // game doesn't just instantly end once the trapped piece is removed, and four mobile red
+    // pieces are placed so Red (who benefits from clearing out the permanently stuck black
+    // piece) has the minimum 3 pieces required to use Exchange. Jumps straight past placement
+    // into the movement phase, with Red to move first.
+    function loadExchangeExample() {
+        history.length = 0; // fresh test scenario — the old undo stack no longer applies
+
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                state.board[row][col] = null;
+            }
+        }
+
+        // Vertical 1-wide corridor at column 1, rows 0-4: BLACK caps at top (0,1) and bottom
+        // (4,1), BLACK walls down column 0 and column 2 for rows 1-3. The black piece at (1,1)
+        // can only ever reach (2,1) and (3,1) — exactly 2 free squares, forever — and every
+        // bordering wall square is black, its own color, so red can never breach it.
+        state.board[0][1] = 'black';
+        state.board[1][1] = 'black'; // <- the confined piece
+        state.board[4][1] = 'black';
+        state.board[1][0] = 'black';
+        state.board[2][0] = 'black';
+        state.board[3][0] = 'black';
+        state.board[1][2] = 'black';
+        state.board[2][2] = 'black';
+        state.board[3][2] = 'black';
+
+        // A separate, freely mobile black piece elsewhere, so the game continues after the demo
+        state.board[6][6] = 'black';
+
+        // Four mobile red pieces elsewhere 
+        state.board[5][5] = 'red';
+        state.board[5][6] = 'red';
+        state.board[6][5] = 'red';
+        state.board[6][4] = 'red';
+
+        state.reserves.red = 0;
+        state.reserves.black = 0;
+        state.placedThisTurn = 0;
+        state.selected = false;
+        state.moveSelected = null;
+        state.forcedPiece = null;
+        state.exchangeMode = null;
+        state.exchangeSacrifice = [];
+        state.winner = null;
+        state.phase = 'movement';
+        state.current = 'red';
+        state.skipNote = 'EXAMPLE LOADED — THE BOXED-IN BLACK PIECE IS SEALED BY ITS OWN COLOR, TRY EXCHANGE';
+
+        state.onBoard.red = countOnBoard('red');
+        state.onBoard.black = countOnBoard('black');
+
+        render();
+    }
+
+    // Randomly places every remaining reserved piece (both players, alternating,
+    // 2 at a time) to instantly finish out the placement phase.
+    function autoFillRemaining() {
+        if (state.phase !== 'placement') return;
+
+        pushHistory();
+
+        // Collect every free, non-center square
+        const freeSquares = [];
+        for (let row = 0; row < BOARD_SIZE; row++) {
+            for (let col = 0; col < BOARD_SIZE; col++) {
+                if (!isCenter(row, col) && state.board[row][col] === null) {
+                    freeSquares.push({ row, col });
+                }
+            }
+        }
+        // Shuffle
+        for (let i = freeSquares.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [freeSquares[i], freeSquares[j]] = [freeSquares[j], freeSquares[i]];
+        }
+
+        let squareIndex = 0;
+        state.selected = false;
+
+        while (state.reserves.red > 0 || state.reserves.black > 0) {
+            if (state.reserves[state.current] <= 0) {
+                endTurn();
+                continue;
+            }
+            if (squareIndex >= freeSquares.length) break; // board full, safety guard
+
+            const { row, col } = freeSquares[squareIndex++];
+            state.board[row][col] = state.current;
+            state.reserves[state.current]--;
+            state.placedThisTurn++;
+
+            if (state.placedThisTurn >= 2 || state.reserves[state.current] === 0) {
+                endTurn();
+            }
+        }
+
+        checkPlacementComplete();
+        render();
+    }
+
+    fillBtnEl.addEventListener('click', autoFillRemaining);
+    undoBtnEl.addEventListener('click', undo);
+    exchangeBtnEl.addEventListener('click', () => {
+        if (state.exchangeMode) {
+            cancelExchange();
+        } else {
+            startExchange();
+        }
+    });
+    exampleBtnEl.addEventListener('click', loadExchangeExample);
+
+
+    function nextPhase() {
+        console.log('Placement phase complete. Board:', state.board);
+        beginMovementPhase();
+    }
+
+    buildBoard();
+    render();
+    </script>
+</body></html>
