@@ -231,7 +231,7 @@
         transform: translateY(0);
       }
 
-      /* ============ Win modal ============ */
+      /* ============ Win / setup modal ============ */
       .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -293,18 +293,21 @@
     body {
       min-height: max(884px, 100dvh);
     }
+    @media (max-width: 480px) {
+      body { min-height: 100dvh; }
+    }
   </style>
 </head>
 <body class="flex flex-col min-h-screen">
 <!-- TopAppBar -->
-<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-lg h-16 bg-surface-container-low border-b border-white/5">
-<div class="flex items-center gap-md">
+<header class="fixed top-0 left-0 w-full z-50 flex justify-between items-center px-sm sm:px-lg h-14 sm:h-16 bg-surface-container-low border-b border-white/5">
+<div class="flex items-center gap-sm sm:gap-md">
 <button class="p-2 text-primary hover:bg-surface-bright/10 transition-colors rounded-full active:opacity-80 active:scale-95 transition-all">
 <span class="material-symbols-outlined">menu</span>
 </button>
-<h1 class="font-brand text-headline-md font-bold tracking-tighter text-on-surface" dir="ltr">KHARGBA</h1>
+<h1 class="font-brand text-base sm:text-headline-md font-bold tracking-tighter text-on-surface" dir="ltr">KHARGBA</h1>
 </div>
-<div class="flex items-center gap-md">
+<div class="flex items-center gap-xs sm:gap-md">
 <div class="hidden md:flex items-center gap-lg mr-lg">
 <span class="font-label-mono text-label-mono text-primary cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded">المباراة</span>
 <span id="replay-nav-btn" class="font-label-mono text-label-mono text-on-surface-variant cursor-pointer hover:bg-surface-bright/10 px-3 py-1 rounded transition-colors">إعادة العرض</span>
@@ -322,7 +325,7 @@
 </div>
 </header>
 <!-- Replay control bar (hidden unless a replay is running) -->
-<div id="replay-bar" class="hidden fixed top-16 left-0 w-full z-40 flex items-center justify-center gap-md px-lg py-2 bg-primary-container/95 border-b border-white/10 backdrop-blur-sm">
+<div id="replay-bar" class="hidden fixed top-14 sm:top-16 left-0 w-full z-40 flex flex-wrap items-center justify-center gap-xs sm:gap-md px-sm sm:px-lg py-2 bg-primary-container/95 border-b border-white/10 backdrop-blur-sm">
 <span class="material-symbols-outlined text-on-primary-container text-lg animate-pulse">play_circle</span>
 <span class="font-label-mono text-label-mono text-on-primary-container" id="replay-status-text">جارِ إعادة العرض — الحركة 0/0</span>
 <div class="flex items-center gap-xs ml-md">
@@ -333,25 +336,25 @@
 </div>
 </div>
 <!-- Main Game Arena -->
-<main class="flex-grow flex flex-col items-center justify-center pt-24 pb-32 px-md overflow-y-auto">
-<div class="w-full max-w-7xl flex flex-col items-center gap-xl">
+<main class="flex-grow flex flex-col items-center justify-center pt-16 sm:pt-24 pb-28 sm:pb-32 px-xs sm:px-md overflow-y-auto">
+<div class="w-full max-w-7xl flex flex-col items-center gap-lg sm:gap-xl">
 <!-- Board + Side Reserves -->
-<div class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-lg">
+<div class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-sm sm:gap-lg">
 <!-- Red Reserve (Left) -->
-<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-2 lg:order-1">
+<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-2 lg:order-1">
 <div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest">اللاعب الأول</h3>
+<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest" id="red-reserve-label">اللاعب الأول</h3>
 <span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٤٢٠</span>
 </div>
-<div class="bg-surface-container p-3 rounded-lg w-full">
-<div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="red-reserve"></div>
+<div class="bg-surface-container p-2 sm:p-3 rounded-lg w-full">
+<div class="grid grid-cols-8 lg:grid-cols-4 gap-1 sm:gap-2 justify-items-center" id="red-reserve"></div>
 </div>
 </aside>
 <!-- Centerpiece: The Board -->
 <section class="flex flex-col items-center w-full max-w-[550px] order-1 lg:order-2">
-<div class="board-entrance relative w-full bg-surface-container-highest p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<div class="board-entrance relative w-full bg-surface-container-highest p-2 sm:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 <!-- Board Coordinates - Letters -->
-<div class="flex justify-around px-8 mb-2">
+<div class="flex justify-around px-4 sm:px-8 mb-2">
 <span class="font-label-mono text-[10px] opacity-40">A</span>
 <span class="font-label-mono text-[10px] opacity-40">B</span>
 <span class="font-label-mono text-[10px] opacity-40">C</span>
@@ -362,7 +365,7 @@
 </div>
 <div class="flex">
 <!-- Board Coordinates - Numbers -->
-<div class="flex flex-col justify-around pr-3 py-4">
+<div class="flex flex-col justify-around pr-2 sm:pr-3 py-2 sm:py-4">
 <span class="font-label-mono text-[10px] opacity-40">7</span>
 <span class="font-label-mono text-[10px] opacity-40">6</span>
 <span class="font-label-mono text-[10px] opacity-40">5</span>
@@ -376,39 +379,39 @@
 </div>
 </div>
 <!-- Match Status Info -->
-<div class="mt-lg flex flex-wrap justify-center gap-md items-center">
+<div class="mt-md sm:mt-lg flex flex-wrap justify-center gap-xs sm:gap-md items-center">
 <div class="flex items-center gap-sm">
 <div class="w-4 h-4 rounded-full piece-red"></div>
-<span class="font-label-mono text-label-mono" id="p1-count">لاعب ١: ٢٤</span>
+<span class="font-label-mono text-label-mono" id="p1-count">P1: 24</span>
 </div>
 <div class="font-label-mono text-label-mono px-4 py-1 bg-primary text-on-primary rounded-full animate-pulse" id="turn-indicator">دورك</div>
 <div class="flex items-center gap-sm">
 <div class="w-4 h-4 rounded-full piece-black"></div>
-<span class="font-label-mono text-label-mono" id="p2-count">لاعب ٢: ٢٤</span>
+<span class="font-label-mono text-label-mono" id="p2-count">P2: 24</span>
 </div>
-<button id="undo-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+<button id="undo-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
 تراجع
 </button>
-<button id="fill-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+<button id="fill-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
 تعبئة
 </button>
-<button id="exchange-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+<button id="exchange-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
 تبادل
 </button>
-<button id="example-btn" class="font-label-mono text-label-mono px-4 py-1 bg-surface-container text-primary rounded-full hover:brightness-125 active:scale-95 transition-all border border-primary/40">
+<button id="example-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-container text-primary rounded-full hover:brightness-125 active:scale-95 transition-all border border-primary/40">
 تحميل مثال
 </button>
 </div>
 <div class="mt-sm font-label-mono text-[10px] opacity-60 text-center" id="move-note"></div>
 </section>
 <!-- Black Reserve (Right) -->
-<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-3">
+<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-3">
 <div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest">اللاعب الثاني</h3>
+<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest" id="black-reserve-label">اللاعب الثاني</h3>
 <span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٣٩٥</span>
 </div>
-<div class="bg-surface-container p-3 rounded-lg w-full">
-<div class="grid grid-cols-8 lg:grid-cols-4 gap-2 justify-items-center" id="black-reserve"></div>
+<div class="bg-surface-container p-2 sm:p-3 rounded-lg w-full">
+<div class="grid grid-cols-8 lg:grid-cols-4 gap-1 sm:gap-2 justify-items-center" id="black-reserve"></div>
 </div>
 </aside>
 </div>
@@ -467,15 +470,68 @@ PLAY AGAIN
 </div>
 </div>
 
+<!-- Setup Modal: color choice + dice roll (shown before every new match) -->
+<div class="modal-backdrop" id="setup-modal">
+<div class="modal-card bg-surface-container-high border border-white/10 rounded-xl shadow-2xl px-lg py-lg w-[92%] max-w-md flex flex-col items-center text-center gap-md">
+<!-- Step 1: color choice -->
+<div id="setup-step-color" class="w-full flex flex-col items-center gap-md">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">اختر لونك يا اللاعب الأول</h2>
+<p class="font-body-sm text-body-sm opacity-70">سيحصل اللاعب الثاني على اللون الآخر تلقائياً</p>
+<div class="flex gap-lg mt-sm">
+<button id="setup-pick-red" class="flex flex-col items-center gap-2 group active:scale-95 transition-all">
+<div class="w-16 h-16 rounded-full piece-red border-4 border-transparent group-hover:border-white/60 transition-all"></div>
+<span class="font-label-mono text-label-mono text-primary">أحمر</span>
+</button>
+<button id="setup-pick-black" class="flex flex-col items-center gap-2 group active:scale-95 transition-all">
+<div class="w-16 h-16 rounded-full piece-black border-4 border-transparent group-hover:border-white/60 transition-all"></div>
+<span class="font-label-mono text-label-mono text-on-surface">أسود</span>
+</button>
+</div>
+</div>
+<!-- Step 2: dice roll -->
+<div id="setup-step-dice" class="hidden w-full flex flex-col items-center gap-md">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">من يبدأ؟ رميّة النرد تحدد!</h2>
+<p class="font-body-sm text-body-sm opacity-70">صاحب الرقم الأعلى يبدأ المباراة</p>
+<div class="flex gap-lg sm:gap-xl items-center mt-sm">
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-mono text-[10px] opacity-60" id="setup-die1-label">اللاعب الأول</span>
+<div id="setup-die1" class="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-3xl sm:text-4xl bg-surface-container rounded-lg border border-white/10">⚀</div>
+</div>
+<span class="font-headline-sm text-headline-sm opacity-40">VS</span>
+<div class="flex flex-col items-center gap-1">
+<span class="font-label-mono text-[10px] opacity-60" id="setup-die2-label">اللاعب الثاني</span>
+<div id="setup-die2" class="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center text-3xl sm:text-4xl bg-surface-container rounded-lg border border-white/10">⚀</div>
+</div>
+</div>
+<p class="font-body-sm text-body-sm font-bold text-primary min-h-[20px]" id="setup-dice-result"></p>
+<div class="flex gap-sm w-full mt-sm">
+<button id="setup-roll-btn" class="flex-1 font-label-mono text-label-mono px-4 py-2 bg-primary text-on-primary rounded-full hover:brightness-110 active:scale-95 transition-all">
+رمي النرد
+</button>
+<button id="setup-start-btn" class="hidden flex-1 font-label-mono text-label-mono px-4 py-2 bg-primary text-on-primary rounded-full hover:brightness-110 active:scale-95 transition-all">
+ابدأ المباراة
+</button>
+</div>
+</div>
+</div>
+</div>
+
 <script>
     /* ============================================================
        STRATAGEM — Game Logic
+       PRE-GAME SETUP
+       - Player 1 picks a color (red/black); Player 2 automatically
+         gets the other color.
+       - Both players "roll" a die (animated); whoever rolls higher
+         starts the placement phase. Ties are re-rolled.
+
        PLACEMENT PHASE
        - 7x7 board, center square (3,3) is blocked for placement
        - Each player starts with 24 pieces in reserve
-       - Flow: SELECT a piece from your reserve, then click a
-         DESTINATION square to place it. Valid squares glow while
-         a piece is selected.
+       - Flow: click directly on any free, non-center square to
+         place your next reserve piece there immediately. Valid
+         squares glow whenever it's your turn to place — no need
+         to pick the piece up first.
        - Each turn a player places exactly 2 pieces
        - Turn passes after 2 placements (or sooner if reserve
          runs out mid-turn)
@@ -557,14 +613,25 @@ PLAY AGAIN
         current: 'red',        // whose turn it is
         placedThisTurn: 0,     // 0, 1, or 2 (placement phase)
         phase: 'placement',    // 'placement' | 'movement' | 'movement-stalemate' | 'game-over'
-        selected: false,       // true when the current player has picked up a piece from reserve (placement phase)
         moveSelected: null,    // { row, col } of the board piece picked up to move (movement phase)
         forcedPiece: null,     // { row, col } — during a capture bonus turn, only this piece may move
         exchangeMode: null,    // null | 'select-sacrifice' | 'select-target'
         exchangeSacrifice: [], // array of { row, col } — up to 2 of the current player's own pieces marked to sacrifice
         skipNote: '',          // transient message, e.g. auto-skip or capture notice
-        winner: null            // 'red' | 'black' once phase === 'game-over'
+        winner: null,           // 'red' | 'black' once phase === 'game-over'
+        // Which real-world player number owns which color — set by the pre-game setup flow.
+        playerLabels: {
+            red: { full: 'PLAYER ONE', short: 'P1' },
+            black: { full: 'PLAYER TWO', short: 'P2' }
+        }
     };
+
+    function playerLabel(color) {
+        return state.playerLabels[color].full;
+    }
+    function shortLabel(color) {
+        return state.playerLabels[color].short;
+    }
 
     // Undo history — a stack of full state snapshots taken right before each
     // game-changing action (a placement, a move, or a full auto-fill).
@@ -590,6 +657,8 @@ PLAY AGAIN
     const boardEl = document.getElementById('board');
     const redReserveEl = document.getElementById('red-reserve');
     const blackReserveEl = document.getElementById('black-reserve');
+    const redReserveLabelEl = document.getElementById('red-reserve-label');
+    const blackReserveLabelEl = document.getElementById('black-reserve-label');
     const turnIndicatorEl = document.getElementById('turn-indicator');
     const p1CountEl = document.getElementById('p1-count');
     const p2CountEl = document.getElementById('p2-count');
@@ -615,6 +684,18 @@ PLAY AGAIN
     const replayStopBtnEl = document.getElementById('replay-stop-btn');
     const replaySlowerBtnEl = document.getElementById('replay-slower-btn');
     const replayFasterBtnEl = document.getElementById('replay-faster-btn');
+    const setupModalEl = document.getElementById('setup-modal');
+    const setupStepColorEl = document.getElementById('setup-step-color');
+    const setupStepDiceEl = document.getElementById('setup-step-dice');
+    const setupPickRedBtnEl = document.getElementById('setup-pick-red');
+    const setupPickBlackBtnEl = document.getElementById('setup-pick-black');
+    const setupDie1El = document.getElementById('setup-die1');
+    const setupDie2El = document.getElementById('setup-die2');
+    const setupDie1LabelEl = document.getElementById('setup-die1-label');
+    const setupDie2LabelEl = document.getElementById('setup-die2-label');
+    const setupDiceResultEl = document.getElementById('setup-dice-result');
+    const setupRollBtnEl = document.getElementById('setup-roll-btn');
+    const setupStartBtnEl = document.getElementById('setup-start-btn');
 
     /* ============ Sound engine (tiny WebAudio beeps, no assets needed) ============ */
     let soundEnabled = true;
@@ -649,6 +730,7 @@ PLAY AGAIN
         select: () => playTone(700, 0.05, 'sine', 0.08),
         invalid: () => playTone(140, 0.12, 'square', 0.08),
         exchange: () => { playTone(300, 0.1, 'sawtooth'); playTone(500, 0.14, 'sawtooth', 0.1, 0.08); },
+        dice: () => playTone(380, 0.05, 'square', 0.06),
         win: () => {
             [523.25, 659.25, 783.99, 1046.5].forEach((f, i) => playTone(f, 0.28, 'triangle', 0.13, i * 0.13));
         }
@@ -731,7 +813,7 @@ PLAY AGAIN
 
     /* ============ Win modal controls ============ */
     function showWinModal(winnerColor) {
-        const winnerLabel = winnerColor === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+        const winnerLabel = playerLabel(winnerColor);
         modalWinnerTextEl.textContent = `${winnerLabel} WINS`;
         modalDetailEl.textContent = winnerColor === 'red'
             ? 'Red has cleared the board of black pieces. Victory secured.'
@@ -748,14 +830,105 @@ PLAY AGAIN
     modalCloseBtnEl.addEventListener('click', hideWinModal);
     modalNewGameBtnEl.addEventListener('click', () => {
         hideWinModal();
-        resetGame();
+        openSetupModal();
     });
     newGameBtnEl.addEventListener('click', () => {
         if (isInputLocked()) return;
         if (state.phase !== 'game-over') {
-            if (!confirm('Start a new game? Current progress will be lost.')) return;
+            if (!confirm('بدء مباراة جديدة؟ سيتم فقدان التقدم الحالي.')) return;
         }
-        resetGame();
+        openSetupModal();
+    });
+
+    /* ============ Pre-game setup: color choice + dice roll ============ */
+    const ARABIC_LABEL = { 'PLAYER ONE': 'اللاعب الأول', 'PLAYER TWO': 'اللاعب الثاني' };
+    const DICE_FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    let setupChosenColor = null; // color Player One picked this round
+    let setupStarterColor = null;
+    let diceRollTimer = null;
+
+    function updateReserveLabels() {
+        redReserveLabelEl.textContent = ARABIC_LABEL[playerLabel('red')] || playerLabel('red');
+        blackReserveLabelEl.textContent = ARABIC_LABEL[playerLabel('black')] || playerLabel('black');
+    }
+
+    function openSetupModal() {
+        hideWinModal();
+        if (replayModeActive) stopReplay();
+        clearTimeout(diceRollTimer);
+        setupChosenColor = null;
+        setupStarterColor = null;
+        setupStepColorEl.classList.remove('hidden');
+        setupStepDiceEl.classList.add('hidden');
+        setupDiceResultEl.textContent = '';
+        setupDie1El.textContent = '⚀';
+        setupDie2El.textContent = '⚀';
+        setupDie1LabelEl.textContent = 'اللاعب الأول';
+        setupDie2LabelEl.textContent = 'اللاعب الثاني';
+        setupRollBtnEl.classList.remove('hidden');
+        setupRollBtnEl.disabled = false;
+        setupStartBtnEl.classList.add('hidden');
+        setupModalEl.classList.add('modal-open');
+    }
+    function closeSetupModal() {
+        setupModalEl.classList.remove('modal-open');
+    }
+
+    function pickSetupColor(color) {
+        setupChosenColor = color;
+        sound.select();
+        setupStepColorEl.classList.add('hidden');
+        setupStepDiceEl.classList.remove('hidden');
+    }
+    setupPickRedBtnEl.addEventListener('click', () => pickSetupColor('red'));
+    setupPickBlackBtnEl.addEventListener('click', () => pickSetupColor('black'));
+
+    setupRollBtnEl.addEventListener('click', () => {
+        setupRollBtnEl.disabled = true;
+        setupDiceResultEl.textContent = '';
+        let ticks = 0;
+        clearTimeout(diceRollTimer);
+        const tick = () => {
+            setupDie1El.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+            setupDie2El.textContent = DICE_FACES[Math.floor(Math.random() * 6)];
+            sound.dice();
+            ticks++;
+            if (ticks > 14) {
+                const roll1 = 1 + Math.floor(Math.random() * 6);
+                const roll2 = 1 + Math.floor(Math.random() * 6);
+                setupDie1El.textContent = DICE_FACES[roll1 - 1];
+                setupDie2El.textContent = DICE_FACES[roll2 - 1];
+                resolveSetupDice(roll1, roll2);
+                return;
+            }
+            diceRollTimer = setTimeout(tick, 80);
+        };
+        tick();
+    });
+
+    function resolveSetupDice(roll1, roll2) {
+        if (roll1 === roll2) {
+            setupDiceResultEl.textContent = `تعادل (${roll1} = ${roll2}) — أعد الرمي!`;
+            setupRollBtnEl.disabled = false;
+            return;
+        }
+        const player1Wins = roll1 > roll2;
+        setupStarterColor = player1Wins ? setupChosenColor : otherPlayer(setupChosenColor);
+        setupDiceResultEl.textContent = player1Wins
+            ? `اللاعب الأول يبدأ! (${roll1} مقابل ${roll2})`
+            : `اللاعب الثاني يبدأ! (${roll2} مقابل ${roll1})`;
+        setupRollBtnEl.classList.add('hidden');
+        setupStartBtnEl.classList.remove('hidden');
+    }
+
+    setupStartBtnEl.addEventListener('click', () => {
+        state.playerLabels = {
+            [setupChosenColor]: { full: 'PLAYER ONE', short: 'P1' },
+            [otherPlayer(setupChosenColor)]: { full: 'PLAYER TWO', short: 'P2' }
+        };
+        updateReserveLabels();
+        closeSetupModal();
+        resetGame(setupStarterColor);
     });
 
     /* ============ Match Replay ============ */
@@ -768,7 +941,7 @@ PLAY AGAIN
     let liveStateSnapshot = null;
 
     function isInputLocked() {
-        return replayModeActive;
+        return replayModeActive || setupModalEl.classList.contains('modal-open');
     }
 
     function updateReplayStatusText() {
@@ -951,8 +1124,10 @@ PLAY AGAIN
                     el.appendChild(piece);
                 }
 
-                // Placement phase: glow every free, non-center square while a reserve piece is picked up
-                const isValidPlacement = state.phase === 'placement' && state.selected && !occupant && !isCenter(row, col);
+                // Placement phase: every free, non-center square is a direct placement target
+                // whenever it's this player's turn and they still have reserve pieces left.
+                const isValidPlacement = state.phase === 'placement' && !occupant && !isCenter(row, col) &&
+                    state.reserves[state.current] > 0;
 
                 // Movement phase: glow only the free squares orthogonally adjacent to the selected piece
                 let isValidMoveTarget = false;
@@ -991,16 +1166,11 @@ PLAY AGAIN
         const isActivePlayer = state.phase === 'placement' && state.current === color;
         for (let i = 0; i < count; i++) {
             const piece = document.createElement('div');
-            const isLifted = isActivePlayer && state.selected && i === count - 1; // the "picked up" piece is the top of the stack
             piece.className = [
                 'w-6 h-6 md:w-8 md:h-8 rounded-full transition-transform',
                 color === 'red' ? 'piece-red' : 'piece-black',
-                isActivePlayer ? 'cursor-pointer hover:scale-110' : 'opacity-40',
-                isLifted ? 'ring-2 ring-white -translate-y-1 scale-110' : ''
+                isActivePlayer ? '' : 'opacity-40'
             ].join(' ');
-            if (isActivePlayer) {
-                piece.addEventListener('click', () => handleReserveClick(color, i));
-            }
             container.appendChild(piece);
         }
     }
@@ -1015,11 +1185,11 @@ PLAY AGAIN
             turnIndicatorEl.classList.add('turn-bounce');
         }
         if (state.phase === 'placement') {
-            p1CountEl.textContent = `P1: ${state.reserves.red}`;
-            p2CountEl.textContent = `P2: ${state.reserves.black}`;
+            p1CountEl.textContent = `${shortLabel('red')}: ${state.reserves.red}`;
+            p2CountEl.textContent = `${shortLabel('black')}: ${state.reserves.black}`;
         } else {
-            p1CountEl.textContent = `P1: ${state.onBoard.red}`;
-            p2CountEl.textContent = `P2: ${state.onBoard.black}`;
+            p1CountEl.textContent = `${shortLabel('red')}: ${state.onBoard.red}`;
+            p2CountEl.textContent = `${shortLabel('black')}: ${state.onBoard.black}`;
         }
 
         if (state.phase === 'placement') {
@@ -1048,13 +1218,12 @@ PLAY AGAIN
         }
 
         if (state.phase === 'placement') {
-            const label = state.current === 'red' ? "PLAYER ONE'S TURN" : "PLAYER TWO'S TURN";
-            const hint = state.selected ? ' — CHOOSE A SQUARE' : ' — SELECT A PIECE';
-            turnIndicatorEl.textContent = `${label} (${state.placedThisTurn}/2)${hint}`;
+            const label = playerLabel(state.current);
+            turnIndicatorEl.textContent = `${label} — TAP A SQUARE TO PLACE (${state.placedThisTurn}/2)`;
             turnIndicatorEl.classList.add('animate-pulse', 'bg-primary', 'text-on-primary');
             turnIndicatorEl.classList.remove('bg-surface-bright', 'text-on-surface');
         } else if (state.phase === 'movement') {
-            const label = state.current === 'red' ? "PLAYER ONE'S TURN" : "PLAYER TWO'S TURN";
+            const label = playerLabel(state.current);
             let hint;
             if (state.exchangeMode === 'select-sacrifice') {
                 hint = ` — SACRIFICE 2 OF YOUR PIECES (${state.exchangeSacrifice.length}/2)`;
@@ -1073,7 +1242,7 @@ PLAY AGAIN
             turnIndicatorEl.classList.remove('animate-pulse', 'bg-primary', 'text-on-primary');
             turnIndicatorEl.classList.add('bg-surface-bright', 'text-on-surface');
         } else if (state.phase === 'game-over') {
-            const winnerLabel = state.winner === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const winnerLabel = playerLabel(state.winner);
             turnIndicatorEl.textContent = `${winnerLabel} WINS!`;
             turnIndicatorEl.classList.remove('animate-pulse', 'bg-surface-bright', 'text-on-surface');
             turnIndicatorEl.classList.add('bg-primary', 'text-on-primary');
@@ -1112,7 +1281,7 @@ PLAY AGAIN
         state.current = otherPlayer(state.current);
 
         if (!hasAnyLegalMove(state.current)) {
-            const skippedLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const skippedLabel = playerLabel(state.current);
             state.skipNote = `${skippedLabel} HAS NO LEGAL MOVES — TURN SKIPPED`;
             state.current = otherPlayer(state.current);
 
@@ -1147,7 +1316,7 @@ PLAY AGAIN
 
         // If whoever's turn it naturally is can't move, skip forward same as mid-game
         if (!hasAnyLegalMove(state.current)) {
-            const skippedLabel = state.current === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const skippedLabel = playerLabel(state.current);
             state.skipNote = `${skippedLabel} HAS NO LEGAL MOVES — TURN SKIPPED`;
             state.current = otherPlayer(state.current);
             if (!hasAnyLegalMove(state.current)) {
@@ -1158,7 +1327,7 @@ PLAY AGAIN
         render();
     }
 
-    function resetGame() {
+    function resetGame(startColor) {
         history.length = 0;
         replayLog.length = 0;
         for (let row = 0; row < BOARD_SIZE; row++) {
@@ -1170,10 +1339,9 @@ PLAY AGAIN
         state.reserves.black = 24;
         state.onBoard.red = 0;
         state.onBoard.black = 0;
-        state.current = 'red';
+        state.current = startColor || 'red';
         state.placedThisTurn = 0;
         state.phase = 'placement';
-        state.selected = false;
         state.moveSelected = null;
         state.forcedPiece = null;
         state.exchangeMode = null;
@@ -1186,7 +1354,6 @@ PLAY AGAIN
 
     function endTurn() {
         state.placedThisTurn = 0;
-        state.selected = false;
         state.current = otherPlayer(state.current);
 
         // If the new current player has no pieces left, skip to the one who does
@@ -1198,28 +1365,10 @@ PLAY AGAIN
     function checkPlacementComplete() {
         if (state.reserves.red === 0 && state.reserves.black === 0) {
             state.phase = 'placement-complete';
-            state.selected = false;
             nextPhase();
             return true;
         }
         return false;
-    }
-
-    function handleReserveClick(color, index) {
-        if (isInputLocked()) return;
-        if (state.phase !== 'placement') return;
-        if (color !== state.current) return;           // can only pick up your own pieces
-        if (state.reserves[color] <= 0) return;
-
-        // Clicking the already-selected (top) piece puts it back down
-        const isTopPiece = index === state.reserves[color] - 1;
-        if (state.selected && isTopPiece) {
-            state.selected = false;
-        } else {
-            state.selected = true;
-            sound.select();
-        }
-        render();
     }
 
     function handleSquareClick(row, col) {
@@ -1237,18 +1386,18 @@ PLAY AGAIN
         }
     }
 
+    // Placement is now a single click: tapping any free, non-center square places the
+    // current player's next reserve piece there immediately — no pickup step required.
     function handlePlacementSquareClick(row, col) {
-        if (!state.selected) return;                     // must pick up a piece first
-        if (isCenter(row, col)) return;                  // center is never placeable
-        if (state.board[row][col] !== null) return;       // must be a free square
+        if (state.reserves[state.current] <= 0) return;   // no pieces left to place
+        if (isCenter(row, col)) return;                    // center is never placeable
+        if (state.board[row][col] !== null) return;         // must be a free square
 
         pushHistory();
 
-        // Place the piece
         state.board[row][col] = state.current;
         state.reserves[state.current]--;
         state.placedThisTurn++;
-        state.selected = false;
 
         render();
         animatePlacement(row, col);
@@ -1319,7 +1468,7 @@ PLAY AGAIN
         const capturedCount = captureCells.length;
 
         if (capturedCount > 0) {
-            const capLabel = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const capLabel = playerLabel(mover);
             state.skipNote = `${capLabel} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''}!`;
         } else {
             state.skipNote = '';
@@ -1371,7 +1520,7 @@ PLAY AGAIN
         // to capture anything.
         if (capturedCount > 0 && hasCapturingMoveForPiece(row, col, mover)) {
             state.forcedPiece = { row, col };
-            const label = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+            const label = playerLabel(mover);
             state.skipNote = `${label} CAPTURED ${capturedCount} PIECE${capturedCount > 1 ? 'S' : ''} — SAME PIECE CAN EAT AGAIN, GO AGAIN!`;
             render();
             return;
@@ -1612,7 +1761,7 @@ PLAY AGAIN
         const sacrificeCells = [...state.exchangeSacrifice];
         const targetCell = { row, col };
 
-        const label = mover === 'red' ? 'PLAYER ONE' : 'PLAYER TWO';
+        const label = playerLabel(mover);
         state.skipNote = `${label} SACRIFICED 2 PIECES IN AN EXCHANGE!`;
         state.exchangeMode = null;
         state.exchangeSacrifice = [];
@@ -1670,6 +1819,7 @@ PLAY AGAIN
     // piece) has the minimum 3 pieces required to use Exchange. Jumps straight past placement
     // into the movement phase, with Red to move first.
     function loadExchangeExample() {
+        if (isInputLocked()) return;
         history.length = 0; // fresh test scenario — the old undo stack no longer applies
         replayLog.length = 0;
 
@@ -1705,7 +1855,6 @@ PLAY AGAIN
         state.reserves.red = 0;
         state.reserves.black = 0;
         state.placedThisTurn = 0;
-        state.selected = false;
         state.moveSelected = null;
         state.forcedPiece = null;
         state.exchangeMode = null;
@@ -1744,7 +1893,6 @@ PLAY AGAIN
         }
 
         let squareIndex = 0;
-        state.selected = false;
 
         while (state.reserves.red > 0 || state.reserves.black > 0) {
             if (state.reserves[state.current] <= 0) {
@@ -1777,7 +1925,7 @@ PLAY AGAIN
             startExchange();
         }
     });
-    exampleBtnEl.addEventListener('click', () => { if (!isInputLocked()) loadExchangeExample(); });
+    exampleBtnEl.addEventListener('click', loadExchangeExample);
 
 
     function nextPhase() {
@@ -1787,5 +1935,6 @@ PLAY AGAIN
 
     buildBoard();
     render();
+    openSetupModal();
     </script>
 </body></html>
