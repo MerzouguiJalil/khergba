@@ -1514,12 +1514,20 @@ PLAY AGAIN
         animatePlacement(row, col);
         sound.place();
 
+        // Turn passes once the player has placed 2 pieces,
+        // or immediately if their reserve just ran out mid-turn.
+        // This must happen BEFORE the placement-complete check below, so that
+        // if this was the very last piece on the board, the turn has already
+        // been correctly handed back to whoever started the placement phase —
+        // that's who should also open the movement phase.
+        const turnShouldEnd = state.placedThisTurn >= 2 || state.reserves[state.current] === 0;
+        if (turnShouldEnd) {
+            endTurn();
+        }
+
         if (checkPlacementComplete()) return;
 
-        // Turn passes once the player has placed 2 pieces,
-        // or immediately if their reserve just ran out mid-turn
-        if (state.placedThisTurn >= 2 || state.reserves[state.current] === 0) {
-            endTurn();
+        if (turnShouldEnd) {
             render();
         }
     }
