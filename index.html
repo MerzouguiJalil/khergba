@@ -354,7 +354,7 @@
 <section class="flex flex-col items-center w-full max-w-[550px] order-1 lg:order-2">
 <div class="board-entrance relative w-full bg-surface-container-highest p-2 sm:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 <!-- Board Coordinates - Letters -->
-<div class="flex justify-around px-4 sm:px-8 mb-2">
+<div class="flex justify-around px-4 sm:px-8 mb-2" id="coord-letters">
 <span class="font-label-mono text-[10px] opacity-40">A</span>
 <span class="font-label-mono text-[10px] opacity-40">B</span>
 <span class="font-label-mono text-[10px] opacity-40">C</span>
@@ -365,7 +365,7 @@
 </div>
 <div class="flex">
 <!-- Board Coordinates - Numbers -->
-<div class="flex flex-col justify-around pr-2 sm:pr-3 py-2 sm:py-4">
+<div class="flex flex-col justify-around pr-2 sm:pr-3 py-2 sm:py-4" id="coord-numbers">
 <span class="font-label-mono text-[10px] opacity-40">7</span>
 <span class="font-label-mono text-[10px] opacity-40">6</span>
 <span class="font-label-mono text-[10px] opacity-40">5</span>
@@ -374,7 +374,7 @@
 <span class="font-label-mono text-[10px] opacity-40">2</span>
 <span class="font-label-mono text-[10px] opacity-40">1</span>
 </div>
-<!-- 7x7 Grid -->
+<!-- NxN Grid -->
 <div class="game-board board-grid w-full rounded-lg overflow-hidden border border-white/5" id="board"></div>
 </div>
 </div>
@@ -437,7 +437,7 @@
 <div class="flex gap-lg items-center w-full">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined text-sm opacity-50">info</span>
-<span class="font-label-mono text-[10px] opacity-50">شبكة تكتيكية ٧×٧ نشطة | الحركة: اختر القطعة ثم مربع الوجهة</span>
+<span class="font-label-mono text-[10px] opacity-50">شبكة تكتيكية نشطة | الحركة: اختر القطعة ثم مربع الوجهة</span>
 </div>
 <div class="ml-auto flex gap-md">
 <button class="font-label-mono text-[10px] text-on-surface-variant hover:text-primary transition-colors">قلب اللوحة</button>
@@ -470,11 +470,20 @@ PLAY AGAIN
 </div>
 </div>
 
-<!-- Setup Modal: color choice + dice roll (shown before every new match) -->
+<!-- Setup Modal: board size + color choice + dice roll (shown before every new match) -->
 <div class="modal-backdrop" id="setup-modal">
 <div class="modal-card bg-surface-container-high border border-white/10 rounded-xl shadow-2xl px-lg py-lg w-[92%] max-w-md flex flex-col items-center text-center gap-md">
+<!-- Step 0: board size choice -->
+<div id="setup-step-size" class="w-full flex flex-col items-center gap-md">
+<h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">اختر حجم اللوحة</h2>
+<p class="font-body-sm text-body-sm opacity-70">عدد القطع لكل لاعب = (ن×ن - ١) ÷ ٢</p>
+<div class="grid grid-cols-2 gap-sm mt-sm w-full" id="setup-size-options"></div>
+<button id="setup-size-confirm-btn" class="w-full font-label-mono text-label-mono px-4 py-2 bg-primary text-on-primary rounded-full hover:brightness-110 active:scale-95 transition-all mt-sm">
+متابعة
+</button>
+</div>
 <!-- Step 1: color choice -->
-<div id="setup-step-color" class="w-full flex flex-col items-center gap-md">
+<div id="setup-step-color" class="hidden w-full flex flex-col items-center gap-md">
 <h2 class="font-headline-sm text-headline-sm font-bold text-on-surface">اختر لونك يا اللاعب الأول</h2>
 <p class="font-body-sm text-body-sm opacity-70">سيحصل اللاعب الثاني على اللون الآخر تلقائياً</p>
 <div class="flex gap-lg mt-sm">
@@ -518,16 +527,23 @@ PLAY AGAIN
 
 <script>
     /* ============================================================
-       STRATAGEM — Game Logic
+       KHARGBA — Game Logic
+       BOARD SIZE
+       - Board dimension is chosen by the player before every match:
+         5x5, 7x7, 9x9, or 11x11 (must be odd so a single center
+         square exists).
+       - Reserve size per player is always (n*n - 1) / 2, where n is
+         the chosen board dimension.
+
        PRE-GAME SETUP
-       - Player 1 picks a color (red/black); Player 2 automatically
-         gets the other color.
+       - Player 1 first picks the board size, then a color
+         (red/black); Player 2 automatically gets the other color.
        - Both players "roll" a die (animated); whoever rolls higher
          starts the placement phase. Ties are re-rolled.
 
        PLACEMENT PHASE
-       - 7x7 board, center square (3,3) is blocked for placement
-       - Each player starts with 24 pieces in reserve
+       - NxN board, center square is blocked for placement
+       - Each player starts with (n*n - 1) / 2 pieces in reserve
        - Flow: click directly on any free, non-center square to
          place your next reserve piece there immediately. Valid
          squares glow whenever it's your turn to place — no need
@@ -603,12 +619,20 @@ PLAY AGAIN
          (no bonus turn afterward).
        ============================================================ */
 
-    const BOARD_SIZE = 7;
-    const CENTER = { row: 3, col: 3 };
+    // Board size is now selectable: 5, 7, 9 or 11. `BOARD_SIZE` and `CENTER`
+    // are mutable and get (re)computed whenever a new match is set up.
+    const BOARD_SIZE_OPTIONS = [5, 7, 9, 11];
+    let BOARD_SIZE = 7;
+    let CENTER = { row: 3, col: 3 };
+
+    // Reserve count per player is always (n*n - 1) / 2 for an n x n board.
+    function reserveCountFor(size) {
+        return (size * size - 1) / 2;
+    }
 
     const state = {
         board: Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null)), // null | 'red' | 'black'
-        reserves: { red: 24, black: 24 },
+        reserves: { red: reserveCountFor(BOARD_SIZE), black: reserveCountFor(BOARD_SIZE) },
         onBoard: { red: 0, black: 0 },  // live piece counts on the board (movement phase onward)
         current: 'red',        // whose turn it is
         placedThisTurn: 0,     // 0, 1, or 2 (placement phase)
@@ -685,6 +709,9 @@ PLAY AGAIN
     const replaySlowerBtnEl = document.getElementById('replay-slower-btn');
     const replayFasterBtnEl = document.getElementById('replay-faster-btn');
     const setupModalEl = document.getElementById('setup-modal');
+    const setupStepSizeEl = document.getElementById('setup-step-size');
+    const setupSizeOptionsEl = document.getElementById('setup-size-options');
+    const setupSizeConfirmBtnEl = document.getElementById('setup-size-confirm-btn');
     const setupStepColorEl = document.getElementById('setup-step-color');
     const setupStepDiceEl = document.getElementById('setup-step-dice');
     const setupPickRedBtnEl = document.getElementById('setup-pick-red');
@@ -696,6 +723,8 @@ PLAY AGAIN
     const setupDiceResultEl = document.getElementById('setup-dice-result');
     const setupRollBtnEl = document.getElementById('setup-roll-btn');
     const setupStartBtnEl = document.getElementById('setup-start-btn');
+    const coordLettersEl = document.getElementById('coord-letters');
+    const coordNumbersEl = document.getElementById('coord-numbers');
 
     /* ============ Sound engine (tiny WebAudio beeps, no assets needed) ============ */
     let soundEnabled = true;
@@ -840,9 +869,10 @@ PLAY AGAIN
         openSetupModal();
     });
 
-    /* ============ Pre-game setup: color choice + dice roll ============ */
+    /* ============ Pre-game setup: board size + color choice + dice roll ============ */
     const ARABIC_LABEL = { 'PLAYER ONE': 'اللاعب الأول', 'PLAYER TWO': 'اللاعب الثاني' };
     const DICE_FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+    let setupChosenSize = BOARD_SIZE; // board dimension picked for this round
     let setupChosenColor = null; // color Player One picked this round
     let setupStarterColor = null;
     let diceRollTimer = null;
@@ -852,13 +882,41 @@ PLAY AGAIN
         blackReserveLabelEl.textContent = ARABIC_LABEL[playerLabel('black')] || playerLabel('black');
     }
 
+    // Builds the tappable NxN size-choice buttons (5x5 / 7x7 / 9x9 / 11x11), each
+    // showing the resulting per-player reserve count so the (n*n-1)/2 rule is visible
+    // up front.
+    function buildSetupSizeOptions() {
+        setupSizeOptionsEl.innerHTML = '';
+        BOARD_SIZE_OPTIONS.forEach(size => {
+            const btn = document.createElement('button');
+            const isSelected = size === setupChosenSize;
+            btn.className = [
+                'flex flex-col items-center justify-center gap-1 py-3 rounded-lg border-2 transition-all active:scale-95',
+                isSelected ? 'border-primary bg-primary/10' : 'border-white/10 bg-surface-container hover:border-white/30'
+            ].join(' ');
+            btn.innerHTML = `
+                <span class="font-headline-sm text-headline-sm font-bold ${isSelected ? 'text-primary' : 'text-on-surface'}">${size}×${size}</span>
+                <span class="font-label-mono text-[10px] opacity-60">${reserveCountFor(size)} قطعة لكل لاعب</span>
+            `;
+            btn.addEventListener('click', () => {
+                setupChosenSize = size;
+                sound.select();
+                buildSetupSizeOptions();
+            });
+            setupSizeOptionsEl.appendChild(btn);
+        });
+    }
+
     function openSetupModal() {
         hideWinModal();
         if (replayModeActive) stopReplay();
         clearTimeout(diceRollTimer);
+        setupChosenSize = BOARD_SIZE;
         setupChosenColor = null;
         setupStarterColor = null;
-        setupStepColorEl.classList.remove('hidden');
+        buildSetupSizeOptions();
+        setupStepSizeEl.classList.remove('hidden');
+        setupStepColorEl.classList.add('hidden');
         setupStepDiceEl.classList.add('hidden');
         setupDiceResultEl.textContent = '';
         setupDie1El.textContent = '⚀';
@@ -873,6 +931,13 @@ PLAY AGAIN
     function closeSetupModal() {
         setupModalEl.classList.remove('modal-open');
     }
+
+    function confirmSetupSize() {
+        sound.select();
+        setupStepSizeEl.classList.add('hidden');
+        setupStepColorEl.classList.remove('hidden');
+    }
+    setupSizeConfirmBtnEl.addEventListener('click', confirmSetupSize);
 
     function pickSetupColor(color) {
         setupChosenColor = color;
@@ -928,7 +993,7 @@ PLAY AGAIN
         };
         updateReserveLabels();
         closeSetupModal();
-        resetGame(setupStarterColor);
+        resetGame(setupStarterColor, setupChosenSize);
     });
 
     /* ============ Match Replay ============ */
@@ -971,10 +1036,24 @@ PLAY AGAIN
         replayNavBtnEl.classList.add('text-primary');
         updateReplayStatusText();
 
-        Object.assign(state, JSON.parse(replayFrames[0]));
-        render();
+        applyReplayFrame(JSON.parse(replayFrames[0]));
 
         scheduleNextReplayFrame();
+    }
+
+    // Applies a stored snapshot during replay, re-syncing BOARD_SIZE/CENTER and
+    // rebuilding the board DOM if that snapshot used a different board dimension
+    // than the one currently on screen (a replay can span matches of different sizes).
+    function applyReplayFrame(snapshot) {
+        const snapshotSize = snapshot.board.length;
+        if (snapshotSize !== BOARD_SIZE) {
+            BOARD_SIZE = snapshotSize;
+            CENTER = { row: Math.floor(BOARD_SIZE / 2), col: Math.floor(BOARD_SIZE / 2) };
+            buildBoard();
+            renderCoordinates();
+        }
+        Object.assign(state, snapshot);
+        render();
     }
 
     function scheduleNextReplayFrame() {
@@ -992,8 +1071,7 @@ PLAY AGAIN
             return;
         }
         replayIndex++;
-        Object.assign(state, JSON.parse(replayFrames[replayIndex]));
-        render();
+        applyReplayFrame(JSON.parse(replayFrames[replayIndex]));
         updateReplayStatusText();
         scheduleNextReplayFrame();
     }
@@ -1007,9 +1085,10 @@ PLAY AGAIN
         replayNavBtnEl.classList.remove('text-primary');
 
         if (liveStateSnapshot) {
-            Object.assign(state, JSON.parse(liveStateSnapshot));
+            applyReplayFrame(JSON.parse(liveStateSnapshot));
+        } else {
+            render();
         }
-        render();
     }
 
     replayNavBtnEl.addEventListener('click', startReplay);
@@ -1035,8 +1114,31 @@ PLAY AGAIN
         return boardEl.children[row * BOARD_SIZE + col];
     }
 
+    // Renders the A/B/C… column letters and N…1 row numbers above/beside the
+    // board, sized to the current BOARD_SIZE.
+    function renderCoordinates() {
+        coordLettersEl.innerHTML = '';
+        for (let col = 0; col < BOARD_SIZE; col++) {
+            const span = document.createElement('span');
+            span.className = 'font-label-mono text-[10px] opacity-40';
+            span.textContent = String.fromCharCode(65 + col); // A, B, C, ...
+            coordLettersEl.appendChild(span);
+        }
+        coordNumbersEl.innerHTML = '';
+        for (let row = BOARD_SIZE; row >= 1; row--) {
+            const span = document.createElement('span');
+            span.className = 'font-label-mono text-[10px] opacity-40';
+            span.textContent = String(row);
+            coordNumbersEl.appendChild(span);
+        }
+    }
+
     function buildBoard() {
         boardEl.innerHTML = '';
+        // The board-grid CSS class hardcodes a 7x7 template as a fallback; override
+        // it inline here so any selected board size renders correctly.
+        boardEl.style.gridTemplateColumns = `repeat(${BOARD_SIZE}, 1fr)`;
+        boardEl.style.gridTemplateRows = `repeat(${BOARD_SIZE}, 1fr)`;
         for (let row = 0; row < BOARD_SIZE; row++) {
             for (let col = 0; col < BOARD_SIZE; col++) {
                 const isLight = (row + col) % 2 === 0;
@@ -1327,16 +1429,22 @@ PLAY AGAIN
         render();
     }
 
-    function resetGame(startColor) {
+    // Rebuilds the board array/UI for the given size (defaults to the current
+    // BOARD_SIZE if omitted) and starts a fresh placement phase. Reserves are
+    // always recomputed as (size*size - 1) / 2 per player.
+    function resetGame(startColor, size) {
+        if (size && BOARD_SIZE_OPTIONS.includes(size)) {
+            BOARD_SIZE = size;
+            CENTER = { row: Math.floor(BOARD_SIZE / 2), col: Math.floor(BOARD_SIZE / 2) };
+        }
+
         history.length = 0;
         replayLog.length = 0;
-        for (let row = 0; row < BOARD_SIZE; row++) {
-            for (let col = 0; col < BOARD_SIZE; col++) {
-                state.board[row][col] = null;
-            }
-        }
-        state.reserves.red = 24;
-        state.reserves.black = 24;
+
+        state.board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
+        const reserveCount = reserveCountFor(BOARD_SIZE);
+        state.reserves.red = reserveCount;
+        state.reserves.black = reserveCount;
         state.onBoard.red = 0;
         state.onBoard.black = 0;
         state.current = startColor || 'red';
@@ -1348,6 +1456,9 @@ PLAY AGAIN
         state.exchangeSacrifice = [];
         state.skipNote = '';
         state.winner = null;
+
+        buildBoard();
+        renderCoordinates();
         showToast('');
         render();
     }
@@ -1818,16 +1929,24 @@ PLAY AGAIN
     // pieces are placed so Red (who benefits from clearing out the permanently stuck black
     // piece) has the minimum 3 pieces required to use Exchange. Jumps straight past placement
     // into the movement phase, with Red to move first.
+    //
+    // This example scenario is only meaningful on a board with at least 7 columns/rows (it
+    // uses column/row indices up to 6), so if the currently selected board is smaller (5x5)
+    // it is temporarily rebuilt at 7x7 for the demo.
     function loadExchangeExample() {
         if (isInputLocked()) return;
+
+        if (BOARD_SIZE < 7) {
+            BOARD_SIZE = 7;
+            CENTER = { row: Math.floor(BOARD_SIZE / 2), col: Math.floor(BOARD_SIZE / 2) };
+            buildBoard();
+            renderCoordinates();
+        }
+
         history.length = 0; // fresh test scenario — the old undo stack no longer applies
         replayLog.length = 0;
 
-        for (let row = 0; row < BOARD_SIZE; row++) {
-            for (let col = 0; col < BOARD_SIZE; col++) {
-                state.board[row][col] = null;
-            }
-        }
+        state.board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
 
         // Vertical 1-wide corridor at column 1, rows 0-4: BLACK caps at top (0,1) and bottom
         // (4,1), BLACK walls down column 0 and column 2 for rows 1-3. The black piece at (1,1)
@@ -1934,6 +2053,7 @@ PLAY AGAIN
     }
 
     buildBoard();
+    renderCoordinates();
     render();
     openSetupModal();
     </script>
