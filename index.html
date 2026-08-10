@@ -288,6 +288,55 @@
       .icon-btn:active {
         transform: scale(0.9);
       }
+
+      /* ============ Side control panels (replace old reserve piece grids) ============ */
+      .side-panel-btn {
+        flex: 1 1 auto;
+        min-width: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+      }
+
+      /* ============ Mobile: side panels become the bottom action bar ============ */
+      @media (max-width: 1023px) {
+        .side-panel {
+          position: fixed !important;
+          bottom: 0 !important;
+          top: auto !important;
+          z-index: 50 !important;
+          width: 50% !important;
+          height: 4.25rem !important;
+          border-radius: 0 !important;
+          margin: 0 !important;
+          background-color: #1b1b1c !important; /* surface-container-low */
+        }
+        .side-panel.side-panel-left {
+          left: 0 !important;
+        }
+        .side-panel.side-panel-right {
+          right: 0 !important;
+        }
+      }
+
+      /* ============ Desktop: fit everything in one viewport, no page scroll ============ */
+      @media (min-width: 1024px) {
+        html, body {
+          height: 100vh;
+          overflow: hidden;
+        }
+        #app-main {
+          height: calc(100vh - 4rem - 3rem); /* header (h-16) + footer (h-12) */
+          overflow: hidden;
+          padding-top: 0;
+          padding-bottom: 0;
+          justify-content: center;
+        }
+        #board-section .game-board-wrap {
+          width: min(54vw, 72vh, 660px);
+        }
+      }
     </style>
 <style>
     body {
@@ -295,6 +344,9 @@
     }
     @media (max-width: 480px) {
       body { min-height: 100dvh; }
+    }
+    @media (min-width: 1024px) {
+      body { min-height: 100vh; }
     }
   </style>
 </head>
@@ -336,23 +388,25 @@
 </div>
 </div>
 <!-- Main Game Arena -->
-<main class="flex-grow flex flex-col items-center justify-center pt-16 sm:pt-24 pb-28 sm:pb-32 px-xs sm:px-md overflow-y-auto">
+<main id="app-main" class="flex-grow flex flex-col items-center justify-center pt-16 sm:pt-24 pb-28 sm:pb-32 px-xs sm:px-md overflow-y-auto lg:overflow-hidden">
 <div class="w-full max-w-7xl flex flex-col items-center gap-lg sm:gap-xl">
-<!-- Board + Side Reserves -->
+<!-- Board + Side Control Panels -->
 <div class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-sm sm:gap-lg">
-<!-- Red Reserve (Left) -->
-<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-2 lg:order-1">
-<div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-primary uppercase tracking-widest" id="red-reserve-label">اللاعب الأول</h3>
-<span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٤٢٠</span>
-</div>
-<div class="bg-surface-container p-2 sm:p-3 rounded-lg w-full">
-<div class="grid grid-cols-8 lg:grid-cols-4 gap-1 sm:gap-2 justify-items-center" id="red-reserve"></div>
+<!-- Red Side Panel (Left) -->
+<aside class="side-panel side-panel-left flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] order-2 lg:order-1">
+<div class="w-full h-full flex flex-row lg:flex-col items-center gap-sm px-sm lg:px-0">
+<button id="undo-btn" class="side-panel-btn font-label-mono text-label-mono px-3 sm:px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+<span class="material-symbols-outlined text-base">undo</span>
+<span>تراجع</span>
+</button>
+<button id="fill-btn" class="side-panel-btn font-label-mono text-label-mono px-3 sm:px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+تعبئة
+</button>
 </div>
 </aside>
 <!-- Centerpiece: The Board -->
-<section class="flex flex-col items-center w-full max-w-[550px] order-1 lg:order-2">
-<div class="board-entrance relative w-full bg-surface-container-highest p-2 sm:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+<section id="board-section" class="flex flex-col items-center w-full max-w-[650px] order-1 lg:order-2">
+<div class="game-board-wrap board-entrance relative w-full bg-surface-container-highest p-2 sm:p-4 rounded-xl shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
 <!-- Board Coordinates - Letters -->
 <div class="flex justify-around px-4 sm:px-8 mb-2" id="coord-letters">
 <span class="font-label-mono text-[10px] opacity-40">A</span>
@@ -389,51 +443,23 @@
 <div class="w-4 h-4 rounded-full piece-black"></div>
 <span class="font-label-mono text-label-mono" id="p2-count">P2: 24</span>
 </div>
-<button id="undo-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-تراجع
-</button>
-<button id="fill-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-تعبئة
-</button>
-<button id="exchange-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
-تبادل
-</button>
-<button id="example-btn" class="font-label-mono text-label-mono px-3 sm:px-4 py-1 bg-surface-container text-primary rounded-full hover:brightness-125 active:scale-95 transition-all border border-primary/40">
-تحميل مثال
-</button>
 </div>
 <div class="mt-sm font-label-mono text-[10px] opacity-60 text-center" id="move-note"></div>
 </section>
-<!-- Black Reserve (Right) -->
-<aside class="flex flex-col items-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[140px] order-3">
-<div class="w-full flex flex-col items-center gap-1 mb-1">
-<h3 class="font-label-mono text-label-mono text-on-surface uppercase tracking-widest" id="black-reserve-label">اللاعب الثاني</h3>
-<span class="font-label-mono text-[10px] opacity-60">النتيجة: ١٣٩٥</span>
-</div>
-<div class="bg-surface-container p-2 sm:p-3 rounded-lg w-full">
-<div class="grid grid-cols-8 lg:grid-cols-4 gap-1 sm:gap-2 justify-items-center" id="black-reserve"></div>
+<!-- Black Side Panel (Right) -->
+<aside class="side-panel side-panel-right flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] order-3">
+<div class="w-full h-full flex flex-row lg:flex-col items-center gap-sm px-sm lg:px-0">
+<button id="exchange-btn" class="side-panel-btn font-label-mono text-label-mono px-3 sm:px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
+<span class="material-symbols-outlined text-base">sync_alt</span>
+<span>مقايضة</span>
+</button>
 </div>
 </aside>
 </div>
 </div>
 </main>
-<!-- BottomNavBar (Mobile Only) -->
-<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-md py-sm bg-surface-container-lowest shadow-lg border-t border-white/5">
-<div class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full p-2 scale-90 duration-150">
-<span class="material-symbols-outlined">grid_view</span>
-</div>
-<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
-<span class="material-symbols-outlined">history</span>
-</div>
-<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
-<span class="material-symbols-outlined">leaderboard</span>
-</div>
-<div class="flex flex-col items-center justify-center text-on-surface-variant p-2 hover:text-primary transition-all">
-<span class="material-symbols-outlined">person</span>
-</div>
-</nav>
 <!-- Footer / Tooltip Bar (Desktop) -->
-<footer class="hidden md:flex fixed bottom-0 left-0 w-full h-12 bg-surface-container-lowest items-center px-lg border-t border-white/5">
+<footer class="hidden lg:flex fixed bottom-0 left-0 w-full h-12 bg-surface-container-lowest items-center px-lg border-t border-white/5">
 <div class="flex gap-lg items-center w-full">
 <div class="flex items-center gap-xs">
 <span class="material-symbols-outlined text-sm opacity-50">info</span>
@@ -585,10 +611,12 @@ PLAY AGAIN
        - Usable anytime on your turn during the movement phase, in
          place of a normal move. Not usable mid capture-chain
          (while a forced piece bonus turn is in progress).
-       - Requires at least 3 of your own pieces on the board. Since
-         a player loses at 0 pieces, sacrificing 2 must
-         always leave at least 1 behind — so you can never trigger
-         your own loss as a side effect of using the feature.
+       - Requires at least 2 of your own pieces on the board (you
+         need 2 pieces to sacrifice). Unlike before, there is no
+         extra safety margin: if sacrificing your last 2 pieces
+         drops you to 0 pieces on the board, you lose immediately —
+         exactly like reaching 0 pieces through any other means. So
+         using Exchange with only 2 pieces left is a real gamble.
        - Flow: click EXCHANGE -> pick exactly 2 of your own pieces
          anywhere on the board to sacrifice -> then pick one
          opponent piece to remove.
@@ -607,7 +635,15 @@ PLAY AGAIN
               does NOT qualify — that piece is one the opponent
               controls and could reposition later, and it already
               sits one step from a capture, so the confinement isn't
-              actually permanent.
+              actually permanent. Board edges are NOT part of the
+              wall and need no color check — a board edge can never
+              be occupied by anyone, so it always seals the pocket
+              on its own. This applies fully at corners and along
+              the border: a pocket can be bounded partly (or even
+              mostly) by board edges and partly by same-color
+              pieces and still qualify, as long as every OCCUPIED
+              square on its boundary is the trapped piece's own
+              color.
          This is NOT the same as "currently safe from capture": a
          piece with wide-open board space around it does not qualify
          just because it happens to be safe this turn, and a piece
@@ -679,17 +715,12 @@ PLAY AGAIN
     }
 
     const boardEl = document.getElementById('board');
-    const redReserveEl = document.getElementById('red-reserve');
-    const blackReserveEl = document.getElementById('black-reserve');
-    const redReserveLabelEl = document.getElementById('red-reserve-label');
-    const blackReserveLabelEl = document.getElementById('black-reserve-label');
     const turnIndicatorEl = document.getElementById('turn-indicator');
     const p1CountEl = document.getElementById('p1-count');
     const p2CountEl = document.getElementById('p2-count');
     const fillBtnEl = document.getElementById('fill-btn');
     const undoBtnEl = document.getElementById('undo-btn');
     const exchangeBtnEl = document.getElementById('exchange-btn');
-    const exampleBtnEl = document.getElementById('example-btn');
     const moveNoteEl = document.getElementById('move-note');
     const soundToggleBtnEl = document.getElementById('sound-toggle-btn');
     const soundIconEl = document.getElementById('sound-icon');
@@ -877,11 +908,6 @@ PLAY AGAIN
     let setupStarterColor = null;
     let diceRollTimer = null;
 
-    function updateReserveLabels() {
-        redReserveLabelEl.textContent = ARABIC_LABEL[playerLabel('red')] || playerLabel('red');
-        blackReserveLabelEl.textContent = ARABIC_LABEL[playerLabel('black')] || playerLabel('black');
-    }
-
     // Builds the tappable NxN size-choice buttons (5x5 / 7x7 / 9x9 / 11x11), each
     // showing the resulting per-player reserve count so the (n*n-1)/2 rule is visible
     // up front.
@@ -991,7 +1017,6 @@ PLAY AGAIN
             [setupChosenColor]: { full: 'PLAYER ONE', short: 'P1' },
             [otherPlayer(setupChosenColor)]: { full: 'PLAYER TWO', short: 'P2' }
         };
-        updateReserveLabels();
         closeSetupModal();
         resetGame(setupStarterColor, setupChosenSize);
     });
@@ -1263,20 +1288,6 @@ PLAY AGAIN
         }
     }
 
-    function renderReserve(container, color, count) {
-        container.innerHTML = '';
-        const isActivePlayer = state.phase === 'placement' && state.current === color;
-        for (let i = 0; i < count; i++) {
-            const piece = document.createElement('div');
-            piece.className = [
-                'w-6 h-6 md:w-8 md:h-8 rounded-full transition-transform',
-                color === 'red' ? 'piece-red' : 'piece-black',
-                isActivePlayer ? '' : 'opacity-40'
-            ].join(' ');
-            container.appendChild(piece);
-        }
-    }
-
     let lastTurnKey = '';
     function renderStatus() {
         const turnKey = `${state.phase}|${state.current}|${state.exchangeMode}|${!!state.forcedPiece}|${state.winner}`;
@@ -1307,13 +1318,13 @@ PLAY AGAIN
         undoBtnEl.classList.toggle('cursor-not-allowed', history.length === 0);
 
         if (state.exchangeMode) {
-            exchangeBtnEl.textContent = 'CANCEL EXCHANGE';
+            exchangeBtnEl.innerHTML = '<span class="material-symbols-outlined text-base">close</span><span>إلغاء المقايضة</span>';
             exchangeBtnEl.disabled = false;
             exchangeBtnEl.classList.remove('opacity-40', 'cursor-not-allowed');
         } else {
-            exchangeBtnEl.textContent = 'EXCHANGE';
+            exchangeBtnEl.innerHTML = '<span class="material-symbols-outlined text-base">sync_alt</span><span>مقايضة</span>';
             const canStartExchange = state.phase === 'movement' && !state.forcedPiece &&
-                state.onBoard[state.current] >= 3 && hasAnyValidExchangeTarget(state.current);
+                state.onBoard[state.current] >= 2 && hasAnyValidExchangeTarget(state.current);
             exchangeBtnEl.disabled = !canStartExchange;
             exchangeBtnEl.classList.toggle('opacity-40', !canStartExchange);
             exchangeBtnEl.classList.toggle('cursor-not-allowed', !canStartExchange);
@@ -1355,8 +1366,6 @@ PLAY AGAIN
 
     function render() {
         renderBoard();
-        renderReserve(redReserveEl, 'red', state.reserves.red);
-        renderReserve(blackReserveEl, 'black', state.reserves.black);
         renderStatus();
     }
 
@@ -1746,8 +1755,11 @@ PLAY AGAIN
     // Given a confinement pocket (the set of squares returned by getConfinementPocket — the
     // piece's own square plus every empty square it can reach), returns every occupied square
     // that immediately borders the pocket from outside it. These bordering pieces are the
-    // "wall" that seals the pocket off. Board edges aren't part of the wall since they need no
-    // color and always seal on their own.
+    // "wall" that seals the pocket off. Board edges aren't part of the wall since they need
+    // no color and always seal on their own — getOrthogonalNeighbors already excludes
+    // off-board neighbors, so a pocket touching the edge of the board (including a corner,
+    // where two sides of the pocket may be sealed by the edge simultaneously) is sealed there
+    // for free, with no matching color required on that side.
     function getPocketWall(pocket) {
         const wall = [];
         const seen = new Set();
@@ -1771,7 +1783,10 @@ PLAY AGAIN
     // includes even one opponent-colored piece isn't permanent: that piece is one the opponent
     // controls and could move away or reposition on a later turn, and its presence on the
     // boundary already puts an opponent piece one step from a capture. Only an all-own-color
-    // wall guarantees the opponent can never occupy any square in it.
+    // wall guarantees the opponent can never occupy any square in it. Board edges are excluded
+    // from the wall entirely (see getPocketWall), so a pocket at a corner or along the border
+    // is judged purely on its OCCUPIED boundary squares — the edge itself never needs to match
+    // any color.
     function isWallSameColor(pocket, color) {
         const wall = getPocketWall(pocket);
         return wall.every(({ row, col }) => state.board[row][col] === color);
@@ -1831,7 +1846,7 @@ PLAY AGAIN
     function startExchange() {
         if (state.phase !== 'movement') return;
         if (state.forcedPiece) return;              // can't interrupt a forced capture-chain
-        if (state.onBoard[state.current] < 3) return; // must have at least 1 piece left after sacrificing 2 (0 pieces = a loss)
+        if (state.onBoard[state.current] < 2) return; // need at least 2 pieces on board to sacrifice; sacrificing your last 2 can now cost you the game
         if (!hasAnyValidExchangeTarget(state.current)) return; // nothing legal to target right now
 
         state.moveSelected = null;
@@ -1906,7 +1921,12 @@ PLAY AGAIN
 
             render();
 
-            // Check both sides for a game-ending outcome
+            // Check both sides for a game-ending outcome. Note: the mover can now
+            // lose here too, if the Exchange they just triggered used their last 2
+            // pieces on the board (onBoard[mover] drops to 0) — that check is
+            // evaluated below and takes priority in the (unlikely) case both
+            // reach 0 pieces simultaneously is impossible, but this keeps the
+            // logic explicit and correct either way.
             if (state.onBoard[opponent] === 0) {
                 state.phase = 'game-over';
                 state.winner = mover;
@@ -1924,77 +1944,6 @@ PLAY AGAIN
 
             advanceMovementTurn();
         }, 420);
-    }
-
-    // Builds a genuine confinement trap: a black piece walled into a 1-wide vertical corridor,
-    // capped top and bottom and flanked on both sides by OTHER BLACK pieces — leaving it
-    // at least 2 empty squares to ever shuttle between, sealed by a wall that is entirely its
-    // own color. Under isPermanentlyConfined (pocket size >= 2 AND same-color wall), this is
-    // precisely the case EXCHANGE exists to break: the opponent (red) can never occupy any
-    // square in that wall, so the seal — and the impossibility of ever capturing the trapped
-    // piece — is permanent. A separate, freely mobile black piece is placed elsewhere so the
-    // game doesn't just instantly end once the trapped piece is removed, and four mobile red
-    // pieces are placed so Red (who benefits from clearing out the permanently stuck black
-    // piece) has the minimum 3 pieces required to use Exchange. Jumps straight past placement
-    // into the movement phase, with Red to move first.
-    //
-    // This example scenario is only meaningful on a board with at least 7 columns/rows (it
-    // uses column/row indices up to 6), so if the currently selected board is smaller (5x5)
-    // it is temporarily rebuilt at 7x7 for the demo.
-    function loadExchangeExample() {
-        if (isInputLocked()) return;
-
-        if (BOARD_SIZE < 7) {
-            BOARD_SIZE = 7;
-            CENTER = { row: Math.floor(BOARD_SIZE / 2), col: Math.floor(BOARD_SIZE / 2) };
-            buildBoard();
-            renderCoordinates();
-        }
-
-        history.length = 0; // fresh test scenario — the old undo stack no longer applies
-        replayLog.length = 0;
-
-        state.board = Array.from({ length: BOARD_SIZE }, () => Array(BOARD_SIZE).fill(null));
-
-        // Vertical 1-wide corridor at column 1, rows 0-4: BLACK caps at top (0,1) and bottom
-        // (4,1), BLACK walls down column 0 and column 2 for rows 1-3. The black piece at (1,1)
-        // can only ever reach (2,1) and (3,1) — exactly 2 free squares, forever — and every
-        // bordering wall square is black, its own color, so red can never breach it.
-        state.board[0][1] = 'black';
-        state.board[1][1] = 'black'; // <- the confined piece
-        state.board[4][1] = 'black';
-        state.board[1][0] = 'black';
-        state.board[2][0] = 'black';
-        state.board[3][0] = 'black';
-        state.board[1][2] = 'black';
-        state.board[2][2] = 'black';
-        state.board[3][2] = 'black';
-
-        // A separate, freely mobile black piece elsewhere, so the game continues after the demo
-        state.board[6][6] = 'black';
-
-        // Four mobile red pieces elsewhere 
-        state.board[5][5] = 'red';
-        state.board[5][6] = 'red';
-        state.board[6][5] = 'red';
-        state.board[6][4] = 'red';
-
-        state.reserves.red = 0;
-        state.reserves.black = 0;
-        state.placedThisTurn = 0;
-        state.moveSelected = null;
-        state.forcedPiece = null;
-        state.exchangeMode = null;
-        state.exchangeSacrifice = [];
-        state.winner = null;
-        state.phase = 'movement';
-        state.current = 'red';
-        state.skipNote = 'EXAMPLE LOADED — THE BOXED-IN BLACK PIECE IS SEALED BY ITS OWN COLOR, TRY EXCHANGE';
-
-        state.onBoard.red = countOnBoard('red');
-        state.onBoard.black = countOnBoard('black');
-
-        render();
     }
 
     // Randomly places every remaining reserved piece (both players, alternating,
@@ -2052,8 +2001,6 @@ PLAY AGAIN
             startExchange();
         }
     });
-    exampleBtnEl.addEventListener('click', loadExchangeExample);
-
 
     function nextPhase() {
         console.log('Placement phase complete. Board:', state.board);
