@@ -328,13 +328,14 @@
         }
         #app-main {
           height: calc(100vh - 4rem - 3rem); /* header (h-16) + footer (h-12) */
+          margin-top: 4rem; /* push content below the fixed header */
           overflow: hidden;
           padding-top: 0;
           padding-bottom: 0;
           justify-content: center;
         }
         #board-section .game-board-wrap {
-          width: min(54vw, 72vh, 660px);
+          width: min(62vw, 82vh, 780px);
         }
       }
     </style>
@@ -393,7 +394,7 @@
 <!-- Board + Side Control Panels -->
 <div class="w-full flex flex-col lg:flex-row items-center lg:items-start justify-center gap-sm sm:gap-lg">
 <!-- Red Side Panel (Left) -->
-<aside class="side-panel side-panel-left flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] order-2 lg:order-1">
+<aside class="side-panel side-panel-left flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] lg:bg-transparent lg:border-0 lg:rounded-none lg:p-0 order-2 lg:order-1">
 <div class="w-full h-full flex flex-row lg:flex-col items-center gap-sm px-sm lg:px-0">
 <button id="undo-btn" class="side-panel-btn font-label-mono text-label-mono px-3 sm:px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
 <span class="material-symbols-outlined text-base">undo</span>
@@ -447,7 +448,7 @@
 <div class="mt-sm font-label-mono text-[10px] opacity-60 text-center" id="move-note"></div>
 </section>
 <!-- Black Side Panel (Right) -->
-<aside class="side-panel side-panel-right flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] order-3">
+<aside class="side-panel side-panel-right flex flex-col items-center justify-center gap-sm bg-surface-container-low p-sm sm:p-md rounded-xl border border-white/5 w-full lg:w-[150px] lg:bg-transparent lg:border-0 lg:rounded-none lg:p-0 order-3">
 <div class="w-full h-full flex flex-row lg:flex-col items-center gap-sm px-sm lg:px-0">
 <button id="exchange-btn" class="side-panel-btn font-label-mono text-label-mono px-3 sm:px-4 py-2 bg-surface-bright text-on-surface rounded-full hover:brightness-125 active:scale-95 transition-all border border-white/10">
 <span class="material-symbols-outlined text-base">sync_alt</span>
